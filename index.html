@@ -8,169 +8,171 @@
 </head>
 <body>
 
-    <!-- NAVIGATION -->
-    <nav class="navbar">
-        <div class="nav-inner">
-            <div class="logo">
-                <div class="logo-circle">AS</div>
-                <div class="logo-text">
-                    <h1>Annapurna<span>Sweets</span></h1>
-                    <p>A Tradition of Taste</p>
-                </div>
-            </div>
+    <!-- OUTER DECORATIVE FRAME -->
+    <div class="page-frame">
 
-            <div class="nav-links">
-                <a href="#">Home</a>
-                <div class="dropdown">
-                    <button class="dropdown-btn">Collections &#9660;</button>
-                    <div class="dropdown-menu">
-                        <a href="#sweets">&#11088; Signature Sweets</a>
-                        <a href="#snacks">&#127807; Festive Snacks</a>
-                        <hr>
-                        <a href="#grocery">&#128722; Pantry &amp; Grocery</a>
-                    </div>
-                </div>
-                <a href="#">Heritage</a>
-            </div>
-
-            <div class="nav-icons">
+        <!-- TOP HEADER: Logo + Icons -->
+        <header class="top-header">
+            <div class="header-icons left-icons">
                 <button class="icon-btn">&#128269;</button>
-                <button class="icon-btn bag-btn">&#128144; <span class="badge">0</span></button>
             </div>
-        </div>
-    </nav>
 
-    <!-- HERO -->
-    <header class="hero">
-        <div class="hero-overlay"></div>
-        <div class="hero-inner">
+            <div class="logo-center">
+                <!-- Replace logo.png with your actual logo file after uploading to GitHub -->
+                <img src="logo.png" alt="AS Logo" class="logo-img" onerror="this.style.display='none'; document.getElementById('logo-fallback').style.display='flex';">
+                <div id="logo-fallback" class="logo-fallback">AS</div>
+                <h1 class="brand-name">ANNAPURNA SWEETS</h1>
+                <p class="brand-tagline">Tradition of Taste</p>
+            </div>
+
+            <div class="header-icons right-icons">
+                <button class="icon-btn">&#128100;</button>
+                <button class="icon-btn cart-btn">
+                    &#128722;
+                    <span class="cart-badge">1</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- NAVIGATION BAR -->
+        <nav class="main-nav">
+            <a href="#">HOME</a>
+            <span class="divider">|</span>
+            <a href="#">ABOUT</a>
+            <span class="divider">|</span>
+            <div class="dropdown">
+                <a href="#catalog">SWEETS &#9660;</a>
+                <div class="dropdown-menu">
+                    <a href="#catalog">Signature Sweets</a>
+                    <a href="#catalog">Bengali Sweets</a>
+                    <a href="#catalog">Festive Specials</a>
+                </div>
+            </div>
+            <span class="divider">|</span>
+            <a href="#">FESTIVE BOXES</a>
+            <span class="divider">|</span>
+            <a href="#">GALLERY</a>
+            <span class="divider">|</span>
+            <a href="#">GIFTING</a>
+            <span class="divider">|</span>
+            <a href="#">CONTACT</a>
+        </nav>
+
+        <!-- HERO BANNER -->
+        <section class="hero">
             <div class="hero-text">
-                <div class="hero-tag">
-                    <div class="tag-line"></div>
-                    <span>The Joy of Gifting</span>
-                </div>
-                <h2>Authentic Taste,<br><em>Timeless</em> Tradition.</h2>
-                <p>Handcrafted with pure ghee, premium dry fruits, and centuries of inherited culinary wisdom. Bring home the true essence of Indian festivities.</p>
-                <div class="hero-buttons">
-                    <a href="#sweets" class="btn-primary">Explore Collection</a>
-                    <a href="#" class="btn-ghost">View Lookbook</a>
+                <p class="hero-eyebrow">ANNAPURNA SWEETS</p>
+                <h2 class="hero-sub">Celebrate Festivals with</h2>
+                <h1 class="hero-title">Authentic Taste<br>&amp; Tradition</h1>
+                <p class="hero-desc">Bring the warmth of Indian Sweets to<br>your celebrations.</p>
+                <div class="hero-btns">
+                    <a href="#catalog" class="btn-gold">EXPLORE SWEETS</a>
+                    <a href="#" class="btn-outline">SHOP DIWALI SPECIALS</a>
                 </div>
             </div>
-            <div class="hero-image-wrap">
-                <div class="hero-glow"></div>
-                <img src="https://images.unsplash.com/photo-1550993952-4fb3dcfa0a38?w=800&q=80" alt="Festive Sweets" class="hero-img">
-                <div class="hero-badge">&#11088;</div>
+            <div class="hero-image">
+                <img src="https://images.unsplash.com/photo-1601050690597-df0568f70950?w=900&q=80" alt="Festive Indian Sweets">
             </div>
-        </div>
-    </header>
+        </section>
 
-    <!-- CATALOG -->
-    <main class="catalog">
-        <div class="section-header">
-            <div class="watermark">Exquisite</div>
-            <div class="section-title">
-                <span class="crown">&#128081;</span>
-                <h3>Curated Offerings</h3>
-                <p>Discover our handcrafted selections, made daily with absolute devotion.</p>
-            </div>
-        </div>
+        <!-- CATALOG SECTION -->
+        <section class="catalog" id="catalog">
+            <h2 class="catalog-title">OUR SIGNATURE SWEETS</h2>
 
-        <div class="grid" id="sweets">
+            <div class="product-grid">
 
-            <!-- Card 1 -->
-            <div class="card">
-                <div class="card-tag tag-sweet">Sweets</div>
-                <div class="card-img-wrap">
-                    <div class="card-hover-overlay">
-                        <button class="eye-btn">&#128065;</button>
+                <!-- Card 1 -->
+                <div class="product-card">
+                    <span class="card-number">1</span>
+                    <div class="product-img">
+                        <img src="https://images.unsplash.com/photo-1627885078519-21cb8b776a39?w=400&q=80" alt="Motichoor Laddu">
                     </div>
-                    <img src="https://images.unsplash.com/photo-1627885078519-21cb8b776a39?w=600&q=80" alt="Motichoor Laddu">
+                    <h3>MOTICHOOR LADDU</h3>
+                    <p>Ghee-infused &amp; Delicious</p>
+                    <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
                 </div>
-                <div class="card-body">
-                    <div class="card-top">
-                        <h4>Motichoor Laddu</h4>
-                        <span class="price">&#8377;350</span>
+
+                <!-- Card 2 -->
+                <div class="product-card">
+                    <span class="card-number">2</span>
+                    <div class="product-img">
+                        <img src="https://images.unsplash.com/photo-1666897440416-b7e5de9c1b1a?w=400&q=80" alt="Kaju Katli">
                     </div>
-                    <p>Delicate pearls of gram flour fried in pure desi ghee, soaked in saffron syrup.</p>
-                    <button class="add-btn">Add to Bag</button>
+                    <h3>KAJU KATLI</h3>
+                    <p>Classic &amp; Rich</p>
+                    <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
                 </div>
-            </div>
 
-            <!-- Card 2 -->
-            <div class="card" id="snacks">
-                <div class="card-tag tag-snack">Snacks</div>
-                <div class="card-img-wrap">
-                    <div class="card-hover-overlay">
-                        <button class="eye-btn">&#128065;</button>
+                <!-- Card 3 -->
+                <div class="product-card">
+                    <span class="card-number">3</span>
+                    <div class="product-img">
+                        <img src="https://images.unsplash.com/photo-1605197788044-3d52f7e54bb2?w=400&q=80" alt="Gulab Jamun">
                     </div>
-                    <img src="https://images.unsplash.com/photo-1596450514735-a6e5a6064f20?w=600&q=80" alt="Royal Mixture">
+                    <h3>GULAB JAMUN</h3>
+                    <p>Soft &amp; Syrupy</p>
+                    <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
                 </div>
-                <div class="card-body">
-                    <div class="card-top">
-                        <h4>Royal Mixture</h4>
-                        <span class="price">&#8377;250</span>
+
+                <!-- Card 4 -->
+                <div class="product-card">
+                    <span class="card-number">4</span>
+                    <div class="product-img">
+                        <img src="https://images.unsplash.com/photo-1549497538-303791108f95?w=400&q=80" alt="Special Assortment">
                     </div>
-                    <p>A spicy, crunchy symphony of cashews, lentils, and secret spices.</p>
-                    <button class="add-btn">Add to Bag</button>
+                    <h3>SPECIAL ASSORTMENT</h3>
+                    <p>Festive Gift Box</p>
+                    <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
                 </div>
-            </div>
 
-            <!-- Card 3 -->
-            <div class="card" id="grocery">
-                <div class="card-tag tag-pantry">Pantry</div>
-                <div class="card-img-wrap no-img">
-                    <p>&#128247; Image Unveiling Soon</p>
-                </div>
-                <div class="card-body">
-                    <div class="card-top">
-                        <h4>Pure Cow Ghee</h4>
-                        <span class="price">&#8377;800</span>
+                <!-- Card 5 -->
+                <div class="product-card">
+                    <span class="card-number">5</span>
+                    <div class="product-img">
+                        <img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&q=80" alt="Rasgulla">
                     </div>
-                    <p>1 Liter of aromatic, golden pure cow ghee. The soul of Indian cooking.</p>
-                    <button class="add-btn">Add to Bag</button>
+                    <h3>RASGULLA</h3>
+                    <p>Classic Bengali Sweet</p>
+                    <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
                 </div>
-            </div>
 
-        </div>
-
-        <div class="load-more">
-            <button>Load Entire Catalog&hellip;</button>
-        </div>
-    </main>
-
-    <!-- FOOTER -->
-    <footer class="footer">
-        <div class="footer-inner">
-            <div class="footer-brand">
-                <div class="footer-logo">AS</div>
-                <h2>Annapurna Sweets</h2>
-                <p>Crafting moments of sweetness since inception. Where every bite is a celebration of heritage.</p>
-            </div>
-
-            <div class="footer-links">
-                <h4>Collections</h4>
-                <ul>
-                    <li><a href="#">&#9658; Signature Sweets</a></li>
-                    <li><a href="#">&#9658; Festive Savouries</a></li>
-                    <li><a href="#">&#9658; Premium Dry Fruits</a></li>
-                    <li><a href="#">&#9658; Pantry Essentials</a></li>
-                </ul>
-            </div>
-
-            <div class="footer-social">
-                <h4>Connect</h4>
-                <div class="socials">
-                    <a href="#" class="social-icon">&#128247;</a>
-                    <a href="#" class="social-icon">&#128279;</a>
-                    <a href="#" class="social-icon">&#128172;</a>
+                <!-- Card 6 -->
+                <div class="product-card">
+                    <span class="card-number">6</span>
+                    <div class="product-img">
+                        <img src="https://images.unsplash.com/photo-1633945274405-b86c3a56aa10?w=400&q=80" alt="Sondesh">
+                    </div>
+                    <h3>SONDESH</h3>
+                    <p>Artisanal Bengali Sweet</p>
+                    <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
                 </div>
-                <p><em>Join our newsletter for exclusive festive offers.</em></p>
+
+                <!-- Card 7 -->
+                <div class="product-card">
+                    <span class="card-number">7</span>
+                    <div class="product-img">
+                        <img src="https://images.unsplash.com/photo-1601050690117-94f5f6fa8bd7?w=400&q=80" alt="Cham Cham">
+                    </div>
+                    <h3>CHAM CHAM</h3>
+                    <p>Rich Bengali Sweet</p>
+                    <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+                </div>
+
+                <!-- Card 8 -->
+                <div class="product-card">
+                    <span class="card-number">8</span>
+                    <div class="product-img">
+                        <img src="https://images.unsplash.com/photo-1571167530149-c1105da4c2c0?w=400&q=80" alt="Mishti Doi">
+                    </div>
+                    <h3>MISHTI DOI</h3>
+                    <p>Classic Bengali Sweet Curd</p>
+                    <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+                </div>
+
             </div>
-        </div>
-        <div class="footer-bottom">
-            &copy; 2026 Annapurna Sweets. All rights reserved.
-        </div>
-    </footer>
+        </section>
+
+    </div><!-- end .page-frame -->
 
 </body>
 </html>
