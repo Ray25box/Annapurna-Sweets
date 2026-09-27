@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Annapurna Sweets</title>
+    <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+
+    <!-- LOGIN SCREEN -->
+    <div id="login-screen" class="login-wrap">
+        <div class="login-box">
+            <div class="login-logo">AS</div>
+            <h2>Admin Access</h2>
+            <p>Annapurna Sweets Management Panel</p>
+
+            <div class="input-group">
+                <label>Password</label>
+                <input type="password" id="password-input" placeholder="Enter admin password">
+            </div>
+
+            <div id="login-error" class="error-msg" style="display:none;">
+                &#10060; Incorrect password. Please try again.
+            </div>
+
+            <button onclick="checkPassword()" class="login-btn">Login</button>
+
+            <a href="index.html" class="back-link">&#8592; Back to Store</a>
+        </div>
+    </div>
+
+    <!-- ADMIN PANEL (hidden until login) -->
+    <div id="admin-panel" style="display:none;">
+
+        <!-- Top Bar -->
+        <div class="admin-topbar">
+            <div class="admin-brand">
+                <span class="admin-logo">AS</span>
+                <span>Annapurna Sweets &mdash; Admin Panel</span>
+            </div>
+            <a href="index.html" class="view-site-btn">&#128065; View Live Site</a>
+        </div>
+
+        <div class="admin-body">
+
+            <!-- Status Message -->
+            <div id="status-message" class="status-msg" style="display:none;"></div>
+
+            <!-- Section 1: Excel Upload -->
+            <div class="admin-card">
+                <div class="card-header">
+                    <span class="card-icon">&#128196;</span>
+                    <div>
+                        <h3>Bulk Upload from Excel</h3>
+                        <p>Upload your product list in one click. All products will be updated automatically.</p>
+                    </div>
+                </div>
+
+                <div class="excel-format-hint">
+                    <strong>Excel Column Format:</strong>
+                    <code>Name &nbsp;|&nbsp; Category &nbsp;|&nbsp; Price &nbsp;|&nbsp; Description</code>
+                    <br>
+                    <small>Category must be: <strong>Sweets</strong>, <strong>Snack</strong>, or <strong>Grocery</strong></small>
+                </div>
+
+                <label class="file-upload-label">
+                    <input type="file" id="excel-input" accept=".xlsx,.xls,.csv" onchange="handleExcelUpload(event)" style="display:none;">
+                    <span>&#128196; Choose Excel / CSV File</span>
+                </label>
+            </div>
+
+            <!-- Section 2: Product Management Table -->
+            <div class="admin-card">
+                <div class="card-header">
+                    <span class="card-icon">&#128247;</span>
+                    <div>
+                        <h3>Manage Product Photos</h3>
+                        <p>Upload a photo for each product. Products without photos show a placeholder.</p>
+                    </div>
+                </div>
+
+                <div class="table-wrap">
+                    <table class="product-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Product Name</th>
+                                <th>Category</th>
+                                <th>Current Photo</th>
+                                <th>Upload Photo</th>
+                            </tr>
+                        </thead>
+                        <tbody id="product-table-body">
+                            <tr>
+                                <td colspan="5" class="empty-row">No products yet. Upload an Excel sheet above to get started.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Danger Zone -->
+            <div class="admin-card danger-card">
+                <h3>&#9888; Danger Zone</h3>
+                <p>This will permanently delete all product data and images from this device.</p>
+                <button onclick="clearAllData()" class="danger-btn">&#128465; Clear All Data</button>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- SheetJS for Excel Parsing -->
+    <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+    <script src="admin.js"></script>
+</body>
+</html>

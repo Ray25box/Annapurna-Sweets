@@ -1,0 +1,338 @@
+/* Admin Panel Styles */
+:root {
+    --brown-dark: #6b2a0e;
+    --brown-mid:  #9a3412;
+    --gold:       #c8922a;
+    --cream:      #fdf6ec;
+    --green:      #16a34a;
+    --red:        #dc2626;
+    --gray-light: #f9fafb;
+    --gray-border:#e5e7eb;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: Arial, sans-serif; background: #f3f4f6; min-height: 100vh; }
+a { text-decoration: none; }
+button { cursor: pointer; font-family: Arial, sans-serif; }
+
+/* =============================================
+   LOGIN SCREEN
+   ============================================= */
+.login-wrap {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--brown-dark), var(--brown-mid));
+    padding: 20px;
+}
+
+.login-box {
+    background: white;
+    border-radius: 20px;
+    padding: 48px 40px;
+    width: 100%;
+    max-width: 420px;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    border-top: 5px solid var(--gold);
+}
+
+.login-logo {
+    width: 80px; height: 80px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--brown-mid), var(--brown-dark));
+    color: #fef3c7;
+    font-size: 2rem;
+    font-weight: bold;
+    font-style: italic;
+    font-family: Georgia, serif;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 20px;
+    border: 3px solid var(--gold);
+}
+
+.login-box h2 {
+    font-size: 1.6rem;
+    color: var(--brown-dark);
+    font-family: Georgia, serif;
+    margin-bottom: 6px;
+}
+
+.login-box > p {
+    font-size: 0.85rem;
+    color: #888;
+    margin-bottom: 28px;
+}
+
+.input-group { text-align: left; margin-bottom: 16px; }
+.input-group label { display: block; font-size: 0.8rem; font-weight: 700; color: #555; margin-bottom: 6px; }
+.input-group input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid var(--gray-border);
+    border-radius: 10px;
+    font-size: 1rem;
+    outline: none;
+    transition: border-color 0.2s;
+}
+.input-group input:focus { border-color: var(--gold); }
+
+.error-msg {
+    background: #fef2f2;
+    color: var(--red);
+    font-size: 0.82rem;
+    padding: 10px 14px;
+    border-radius: 8px;
+    border: 1px solid #fecaca;
+    margin-bottom: 14px;
+    text-align: left;
+}
+
+.login-btn {
+    width: 100%;
+    padding: 13px;
+    background: linear-gradient(135deg, var(--brown-mid), var(--brown-dark));
+    color: white;
+    font-size: 1rem;
+    font-weight: 700;
+    border: none;
+    border-radius: 10px;
+    margin-bottom: 16px;
+    transition: opacity 0.2s, transform 0.2s;
+    letter-spacing: 0.05em;
+}
+.login-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+
+.back-link { font-size: 0.82rem; color: #aaa; transition: color 0.2s; }
+.back-link:hover { color: var(--brown-dark); }
+
+/* =============================================
+   ADMIN PANEL
+   ============================================= */
+.admin-topbar {
+    background: linear-gradient(to right, var(--brown-dark), var(--brown-mid));
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 2rem;
+    height: 64px;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.admin-brand {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.admin-logo {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    background: var(--gold);
+    color: var(--brown-dark);
+    font-weight: bold;
+    font-style: italic;
+    font-family: Georgia, serif;
+    font-size: 1.1rem;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+}
+
+.view-site-btn {
+    background: rgba(255,255,255,0.15);
+    color: white;
+    border: 1px solid rgba(255,255,255,0.3);
+    padding: 8px 18px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: background 0.2s;
+}
+.view-site-btn:hover { background: rgba(255,255,255,0.25); }
+
+.admin-body {
+    max-width: 960px;
+    margin: 32px auto;
+    padding: 0 20px 60px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+/* Status Message */
+.status-msg {
+    background: #f0fdf4;
+    color: var(--green);
+    border: 1.5px solid #bbf7d0;
+    border-radius: 10px;
+    padding: 14px 20px;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+/* Admin Cards */
+.admin-card {
+    background: white;
+    border-radius: 16px;
+    padding: 28px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    border: 1px solid var(--gray-border);
+}
+
+.card-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.card-icon {
+    font-size: 2rem;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.card-header h3 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #111;
+    margin-bottom: 4px;
+    font-family: Georgia, serif;
+}
+
+.card-header p {
+    font-size: 0.83rem;
+    color: #666;
+    line-height: 1.5;
+}
+
+/* Excel Format Hint */
+.excel-format-hint {
+    background: #fffbeb;
+    border: 1px solid #fde68a;
+    border-radius: 10px;
+    padding: 14px 18px;
+    font-size: 0.82rem;
+    color: #92400e;
+    margin-bottom: 20px;
+    line-height: 1.8;
+}
+.excel-format-hint code {
+    background: #fef3c7;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-family: monospace;
+    font-size: 0.88rem;
+    color: #78350f;
+}
+
+/* File Upload Button */
+.file-upload-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 28px;
+    background: linear-gradient(135deg, var(--brown-mid), var(--brown-dark));
+    color: white;
+    font-weight: 700;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: opacity 0.2s, transform 0.2s;
+    letter-spacing: 0.04em;
+}
+.file-upload-label:hover { opacity: 0.9; transform: translateY(-1px); }
+
+/* Product Table */
+.table-wrap { overflow-x: auto; border-radius: 10px; border: 1px solid var(--gray-border); }
+
+.product-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.88rem;
+}
+
+.product-table thead {
+    background: #f9fafb;
+    border-bottom: 2px solid var(--gray-border);
+}
+
+.product-table th {
+    text-align: left;
+    padding: 14px 16px;
+    font-weight: 700;
+    color: #555;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+.product-table td {
+    padding: 12px 16px;
+    color: #333;
+    border-bottom: 1px solid var(--gray-border);
+    vertical-align: middle;
+}
+
+.product-table tbody tr:last-child td { border-bottom: none; }
+.product-table tbody tr:hover { background: #fafafa; }
+
+.empty-row {
+    text-align: center;
+    color: #aaa;
+    font-style: italic;
+    padding: 32px !important;
+}
+
+/* Photo upload input in table */
+.product-table input[type="file"] {
+    font-size: 0.75rem;
+    color: #555;
+}
+
+.remove-img-btn {
+    display: block;
+    background: none;
+    border: none;
+    color: var(--red);
+    font-size: 0.75rem;
+    cursor: pointer;
+    margin-top: 4px;
+    padding: 0;
+}
+.remove-img-btn:hover { text-decoration: underline; }
+
+/* Danger Zone Card */
+.danger-card {
+    border-color: #fecaca;
+    background: #fff5f5;
+}
+.danger-card h3 {
+    font-size: 1rem;
+    color: var(--red);
+    font-family: Georgia, serif;
+    margin-bottom: 6px;
+}
+.danger-card p {
+    font-size: 0.83rem;
+    color: #888;
+    margin-bottom: 16px;
+}
+.danger-btn {
+    background: var(--red);
+    color: white;
+    border: none;
+    padding: 10px 24px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    transition: opacity 0.2s;
+}
+.danger-btn:hover { opacity: 0.85; }
