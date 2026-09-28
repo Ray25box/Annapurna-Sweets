@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menu - Annapurna Sweets</title>
+    <style>
+        /* =============================================
+           Annapurna Sweets — Menu Page
+           ============================================= */
+        :root {
+            --brown-dark:   #6b2a0e;
+            --brown-mid:    #8b3a1a;
+            --brown-nav:    #7a3010;
+            --gold:         #c8922a;
+            --gold-light:   #e0b050;
+            --cream:        #fdf6ec;
+            --cream-border: #e8d5b0;
+            --text-brown:   #5a2a0a;
+            --text-gray:    #888;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+        body { font-family: Georgia, 'Times New Roman', serif; background: #e8d5a8; min-height: 100vh; }
+        a { text-decoration: none; color: inherit; }
+
+        /* Page Frame */
+        .page-frame {
+            max-width: 900px;
+            margin: 28px auto;
+            background: var(--cream);
+            border: 6px solid var(--gold);
+            box-shadow:
+                0 0 0 10px var(--cream),
+                0 0 0 14px var(--gold-light),
+                0 0 40px rgba(0,0,0,0.25);
+            overflow: hidden;
+        }
+
+        /* ── Top Bar ── */
+        .top-bar {
+            background: linear-gradient(to bottom, var(--brown-mid), var(--brown-nav));
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            height: 48px;
+        }
+        .back-btn {
+            color: rgba(254,243,199,0.85);
+            font-size: 0.82rem;
+            font-family: Arial, sans-serif;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: color 0.2s;
+        }
+        .back-btn:hover { color: var(--gold-light); }
+        .top-bar-title {
+            color: rgba(254,243,199,0.6);
+            font-size: 0.7rem;
+            font-family: Arial, sans-serif;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+        }
+
+        /* ── Header ── */
+        .page-header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 28px 24px 20px;
+            border-bottom: 1px solid var(--cream-border);
+            background: var(--cream);
+        }
+        .logo-img {
+            width: 72px; height: 72px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid var(--gold);
+            box-shadow: 0 4px 14px rgba(100,40,10,0.2);
+            margin-bottom: 10px;
+        }
+        .logo-fallback {
+            display: none;
+            width: 72px; height: 72px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--brown-mid), var(--brown-dark));
+            color: #fef3c7;
+            font-style: italic;
+            font-size: 1.8rem;
+            font-weight: bold;
+            align-items: center;
+            justify-content: center;
+            border: 3px solid var(--gold);
+            margin-bottom: 10px;
+        }
+        .brand-name {
+            font-size: 1rem;
+            font-weight: 700;
+            letter-spacing: 0.2em;
+            color: var(--text-brown);
+            text-transform: uppercase;
+            font-family: 'Palatino Linotype', Georgia, serif;
+        }
+        .brand-tagline {
+            font-size: 0.68rem;
+            color: var(--gold);
+            letter-spacing: 0.18em;
+            font-family: Arial, sans-serif;
+            font-weight: 500;
+        }
+
+        /* ── Menu Title Banner ── */
+        .menu-title-banner {
+            background: linear-gradient(135deg, var(--brown-dark) 0%, var(--brown-mid) 60%, #a04820 100%);
+            padding: 28px 24px;
+            text-align: center;
+            position: relative;
+        }
+        .menu-title-banner::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image: radial-gradient(circle, rgba(255,255,255,0.05) 1px, transparent 1px);
+            background-size: 18px 18px;
+        }
+        .menu-category-label {
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.25em;
+            color: rgba(253,243,199,0.7);
+            text-transform: uppercase;
+            font-family: Arial, sans-serif;
+            position: relative;
+            z-index: 1;
+            margin-bottom: 6px;
+        }
+        .menu-page-title {
+            font-size: 2rem;
+            font-weight: 700;
+            font-style: italic;
+            color: #fef3c7;
+            letter-spacing: 0.06em;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            position: relative;
+            z-index: 1;
+        }
+        .menu-page-title::after {
+            content: '';
+            display: block;
+            width: 60px;
+            height: 2px;
+            background: var(--gold);
+            margin: 10px auto 0;
+            border-radius: 2px;
+        }
+
+        /* ── Menu Table ── */
+        .menu-section {
+            padding: 36px 32px 48px;
+        }
+
+        .menu-table-wrap {
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1.5px solid var(--cream-border);
+            box-shadow: 0 4px 20px rgba(100,50,10,0.08);
+        }
+
+        table.menu-tbl {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: Arial, sans-serif;
+        }
+
+        /* Header row */
+        table.menu-tbl thead tr {
+            background: linear-gradient(to bottom, var(--brown-mid), var(--brown-nav));
+        }
+        table.menu-tbl thead th {
+            padding: 14px 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: #fef3c7;
+        }
+        table.menu-tbl thead th:first-child { text-align: left; }
+        table.menu-tbl thead th:nth-child(2),
+        table.menu-tbl thead th:nth-child(3) { text-align: right; }
+
+        /* Body rows */
+        table.menu-tbl tbody tr {
+            border-bottom: 1px solid var(--cream-border);
+            transition: background 0.15s;
+        }
+        table.menu-tbl tbody tr:last-child { border-bottom: none; }
+        table.menu-tbl tbody tr:nth-child(even) { background: #fdf8f0; }
+        table.menu-tbl tbody tr:hover { background: #fef3dc; }
+
+        table.menu-tbl tbody td {
+            padding: 13px 20px;
+            font-size: 0.88rem;
+            color: #444;
+            vertical-align: middle;
+        }
+
+        /* S.No column */
+        td.td-sno {
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: #bbb;
+            text-align: left;
+            width: 40px;
+        }
+
+        /* Item name column */
+        td.td-name {
+            font-weight: 600;
+            color: var(--text-brown);
+            font-family: 'Palatino Linotype', Georgia, serif;
+        }
+        td.td-name small {
+            display: block;
+            font-size: 0.72rem;
+            color: var(--text-gray);
+            font-weight: 400;
+            font-family: Arial, sans-serif;
+            margin-top: 2px;
+            font-style: italic;
+        }
+
+        /* Price columns */
+        td.td-price {
+            text-align: right;
+            font-weight: 700;
+            color: var(--gold);
+            font-family: Arial, sans-serif;
+        }
+        td.td-price.na {
+            color: #ccc;
+            font-weight: 500;
+            letter-spacing: 0.05em;
+            font-style: italic;
+        }
+
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 48px 20px;
+            color: var(--text-gray);
+        }
+        .empty-state .empty-icon { font-size: 3rem; margin-bottom: 12px; }
+        .empty-state h3 {
+            font-size: 1.1rem;
+            color: var(--text-brown);
+            margin-bottom: 6px;
+        }
+        .empty-state p {
+            font-size: 0.85rem;
+            font-family: Arial, sans-serif;
+        }
+
+        /* ── Footer Note ── */
+        .menu-footer {
+            text-align: center;
+            padding: 16px 24px 28px;
+            font-size: 0.75rem;
+            color: var(--text-gray);
+            font-family: Arial, sans-serif;
+            border-top: 1px solid var(--cream-border);
+        }
+        .menu-footer span { color: var(--gold); font-weight: 700; }
+
+        /* ── Responsive ── */
+        @media (max-width: 600px) {
+            .menu-section { padding: 24px 14px 36px; }
+            table.menu-tbl thead th,
+            table.menu-tbl tbody td { padding: 11px 12px; }
+            .menu-page-title { font-size: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="page-frame">
+
+    <!-- Top Nav Bar -->
+    <div class="top-bar">
+        <a href="index.html" class="back-btn">&#8592; Back to Store</a>
+        <span class="top-bar-title">ANNAPURNA SWEETS</span>
+        <span></span>
+    </div>
+
+    <!-- Logo Header -->
+    <header class="page-header">
+        <img src="logo.jpg" alt="AS Logo" class="logo-img"
+             onerror="this.style.display='none'; document.getElementById('logo-fb').style.display='flex';">
+        <div id="logo-fb" class="logo-fallback">AS</div>
+        <h1 class="brand-name">ANNAPURNA SWEETS</h1>
+        <p class="brand-tagline">Tradition of Taste</p>
+    </header>
+
+    <!-- Title Banner -->
+    <div class="menu-title-banner">
+        <p class="menu-category-label" id="cat-label">OUR MENU</p>
+        <h2 class="menu-page-title" id="page-title">MENU</h2>
+    </div>
+
+    <!-- Menu Table -->
+    <div class="menu-section">
+        <div class="menu-table-wrap" id="table-wrap">
+            <!-- Populated by JS -->
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="menu-footer">
+        Prices are subject to change &nbsp;&bull;&nbsp; <span>&#8377;</span> All prices in Indian Rupees &nbsp;&bull;&nbsp;
+        <a href="index.html" style="color:var(--gold);font-weight:700;">&#8617; Back to Home</a>
+    </div>
+
+</div>
+
+<script>
+    // =============================================
+    // Menu Page — reads from localStorage
+    // =============================================
+    var STORAGE_KEY = 'annapurna_products';
+
+    // Config per category
+    var CONFIG = {
+        Sweets: {
+            label:  'SWEETS MENU',
+            banner: 'Sweets',
+            col2:   'Price / Pc',
+            col3:   'Price / kg',
+            icon:   '&#127852;'
+        },
+        Snack: {
+            label:  'SNACKS MENU',
+            banner: 'Snacks',
+            col2:   'Price / Pc',
+            col3:   'Price / Plt',
+            icon:   '&#127840;'
+        },
+        Grocery: {
+            label:  'GROCERY MENU',
+            banner: 'Grocery',
+            col2:   'Price / Pc',
+            col3:   'Price / kg',
+            icon:   '&#128717;'
+        }
+    };
+
+    // Read URL param
+    var params = new URLSearchParams(window.location.search);
+    var cat    = params.get('cat') || 'Sweets';
+    var cfg    = CONFIG[cat] || CONFIG['Sweets'];
+
+    // Set page title & banner
+    document.title = cfg.banner + ' Menu — Annapurna Sweets';
+    document.getElementById('cat-label').innerHTML  = cfg.icon + '&nbsp; ' + cfg.banner.toUpperCase();
+    document.getElementById('page-title').textContent = cfg.label.split(' ')[0];
+
+    // Load products
+    var allProducts = [];
+    try { allProducts = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); } catch(e) {}
+    var items = allProducts.filter(function(p) { return p.category === cat; });
+
+    var wrap = document.getElementById('table-wrap');
+
+    if (items.length === 0) {
+        wrap.innerHTML =
+            '<div class="empty-state">' +
+                '<div class="empty-icon">' + cfg.icon + '</div>' +
+                '<h3>No items yet</h3>' +
+                '<p>The admin hasn\'t added any ' + cfg.banner.toLowerCase() + ' yet.<br>Check back soon!</p>' +
+            '</div>';
+    } else {
+        var rows = items.map(function(p, i) {
+            var pc  = (p.pricePerPc  || p.price || '');
+            var sec = (p.pricePerKg  || '');
+
+            var pcCell  = pc  ? '<td class="td-price">&#8377;&nbsp;' + pc  + '</td>'
+                               : '<td class="td-price na">&#8212;&#8212;&#8212;&#8212;</td>';
+            var secCell = sec ? '<td class="td-price">&#8377;&nbsp;' + sec + '</td>'
+                              : '<td class="td-price na">&#8212;&#8212;&#8212;&#8212;</td>';
+
+            var desc = p.description
+                ? '<small>' + p.description + '</small>'
+                : '';
+
+            return '<tr>' +
+                '<td class="td-sno">' + (i + 1) + '</td>' +
+                '<td class="td-name">' + p.name + desc + '</td>' +
+                pcCell +
+                secCell +
+            '</tr>';
+        }).join('');
+
+        wrap.innerHTML =
+            '<table class="menu-tbl">' +
+                '<thead>' +
+                    '<tr>' +
+                        '<th style="width:40px;">#</th>' +
+                        '<th style="text-align:left;">Item</th>' +
+                        '<th>' + cfg.col2 + '</th>' +
+                        '<th>' + cfg.col3 + '</th>' +
+                    '</tr>' +
+                '</thead>' +
+                '<tbody>' + rows + '</tbody>' +
+            '</table>';
+    }
+</script>
+
+</body>
+</html>

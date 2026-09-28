@@ -18,7 +18,6 @@
             </div>
 
             <div class="logo-center">
-                <!-- Replace logo.png with your actual logo file after uploading to GitHub -->
                 <img src="logo.jpg" alt="AS Logo" class="logo-img" onerror="this.style.display='none'; document.getElementById('logo-fallback').style.display='flex';">
                 <div id="logo-fallback" class="logo-fallback">AS</div>
                 <h1 class="brand-name">ANNAPURNA SWEETS</h1>
@@ -41,41 +40,12 @@
             <span class="divider">|</span>
             <a href="#">ABOUT</a>
             <span class="divider">|</span>
-            <div class="dropdown" id="products-dropdown">
-                <a href="javascript:void(0)" onclick="toggleMega(event)">PRODUCTS &#9660;</a>
-                <div class="dropdown-menu mega-menu" id="mega-menu">
-
-                    <!-- Category Tabs -->
-                    <div class="mega-tabs">
-                        <button class="mega-tab active" onclick="switchTab(event,'Sweets')">&#127852; Sweets</button>
-                        <button class="mega-tab"        onclick="switchTab(event,'Snack')">&#127840; Snacks</button>
-                        <button class="mega-tab"        onclick="switchTab(event,'Grocery')">&#128717; Grocery</button>
-                    </div>
-
-                    <!-- Sweets Panel -->
-                    <div id="tab-Sweets" class="mega-content active">
-                        <table class="menu-table">
-                            <thead><tr><th>Item</th><th>Price / Pc</th><th>Price / kg</th></tr></thead>
-                            <tbody id="body-Sweets"><tr><td colspan="3" class="menu-empty">No items yet</td></tr></tbody>
-                        </table>
-                    </div>
-
-                    <!-- Snacks Panel -->
-                    <div id="tab-Snack" class="mega-content">
-                        <table class="menu-table">
-                            <thead><tr><th>Item</th><th>Price / Pc</th><th>Price / kg</th></tr></thead>
-                            <tbody id="body-Snack"><tr><td colspan="3" class="menu-empty">No items yet</td></tr></tbody>
-                        </table>
-                    </div>
-
-                    <!-- Grocery Panel -->
-                    <div id="tab-Grocery" class="mega-content">
-                        <table class="menu-table">
-                            <thead><tr><th>Item</th><th>Price / Pc</th><th>Price / kg</th></tr></thead>
-                            <tbody id="body-Grocery"><tr><td colspan="3" class="menu-empty">No items yet</td></tr></tbody>
-                        </table>
-                    </div>
-
+            <div class="dropdown">
+                <a href="javascript:void(0)">PRODUCTS &#9660;</a>
+                <div class="dropdown-menu">
+                    <a href="menu.html?cat=Sweets">&#127852; Sweets</a>
+                    <a href="menu.html?cat=Snack">&#127840; Snacks</a>
+                    <a href="menu.html?cat=Grocery">&#128717; Grocery</a>
                 </div>
             </div>
             <span class="divider">|</span>
@@ -203,55 +173,6 @@
         </section>
 
     </div><!-- end .page-frame -->
-
-<script>
-    // =============================================
-    // Mega-Menu: populate tables from localStorage
-    // =============================================
-    const MENU_KEY = 'annapurna_products';
-
-    function populateMenuTables() {
-        var products = [];
-        try { products = JSON.parse(localStorage.getItem(MENU_KEY) || '[]'); } catch(e) {}
-
-        ['Sweets', 'Snack', 'Grocery'].forEach(function(cat) {
-            var tbody = document.getElementById('body-' + cat);
-            var items = products.filter(function(p) { return p.category === cat; });
-            if (!tbody) return;
-            if (items.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="3" class="menu-empty">No items added yet</td></tr>';
-                return;
-            }
-            tbody.innerHTML = items.map(function(p) {
-                var pc = p.pricePerPc  ? '&#8377;' + p.pricePerPc  : '&mdash;';
-                var kg = p.pricePerKg  ? '&#8377;' + p.pricePerKg  : '&mdash;';
-                return '<tr><td>' + p.name + '</td><td>' + pc + '</td><td>' + kg + '</td></tr>';
-            }).join('');
-        });
-    }
-
-    function switchTab(e, cat) {
-        e.stopPropagation();
-        document.querySelectorAll('.mega-tab').forEach(function(t) { t.classList.remove('active'); });
-        document.querySelectorAll('.mega-content').forEach(function(c) { c.classList.remove('active'); });
-        e.currentTarget.classList.add('active');
-        document.getElementById('tab-' + cat).classList.add('active');
-    }
-
-    function toggleMega(e) {
-        e.stopPropagation();
-        var menu = document.getElementById('mega-menu');
-        var isOpen = menu.classList.contains('open');
-        if (!isOpen) { populateMenuTables(); }
-        menu.classList.toggle('open');
-    }
-
-    // Close when clicking outside
-    document.addEventListener('click', function() {
-        var menu = document.getElementById('mega-menu');
-        if (menu) menu.classList.remove('open');
-    });
-</script>
 
 </body>
 </html>
