@@ -244,8 +244,9 @@ function removeImage(productId) {
 // EDIT MENU — Add / Remove Items Manually
 // =============================================
 
-// --- Add a New Product manually ---
-function addProduct() {
+let editingProductId = null;
+
+function addOrUpdateProduct() {
     const name        = document.getElementById('new-name').value.trim();
     const category    = document.getElementById('new-category').value;
     const pricePerPc  = document.getElementById('new-price-pc').value.trim();
@@ -257,37 +258,100 @@ function addProduct() {
         return;
     }
 
-    const products = getProducts();
+    let products = getProducts();
 
-    // Check for duplicate name
-    if (products.find(function(p) { return p.name.toLowerCase() === name.toLowerCase(); })) {
-        showMessage('⚠️ "' + name + '" already exists in the menu.', 'error');
-        return;
+    if (editingProductId) {
+        // Update existing item
+        const index = products.findIndex(p => p.id === editingProductId);
+        if (index > -1) {
+            // Check if name changed and conflicts with another existing item
+            const conflict = products.find(p => p.name.toLowerCase() === name.toLowerCase() && p.id !== editingProductId);
+            if (conflict) {
+                showMessage('⚠️ "' + name + '" already exists in the menu.', 'error');
+                return;
+            }
+
+            products[index].name = name;
+            products[index].category = category;
+            products[index].pricePerPc = pricePerPc;
+            products[index].pricePerKg = pricePerKg;
+            products[index].description = description;
+            saveProducts(products);
+            showMessage('✅ "' + name + '" updated!');
+        }
+        cancelEdit(); // This also clears the form and reloads the lists
+    } else {
+        // Add new item
+        if (products.find(function(p) { return p.name.toLowerCase() === name.toLowerCase(); })) {
+            showMessage('⚠️ "' + name + '" already exists in the menu.', 'error');
+            return;
+        }
+
+        const newId = products.length > 0 ? Math.max.apply(null, products.map(function(p) { return p.id; })) + 1 : 1;
+        products.push({
+            id:          newId,
+            name:        name,
+            category:    category,
+            pricePerPc:  pricePerPc,
+            pricePerKg:  pricePerKg,
+            description: description,
+            image:       null
+        });
+        saveProducts(products);
+        showMessage('✅ "' + name + '" added to the menu!');
+        
+        // Clear form
+        document.getElementById('new-name').value        = '';
+        document.getElementById('new-price-pc').value    = '';
+        document.getElementById('new-price-kg').value    = '';
+        document.getElementById('new-description').value = '';
+        
+        loadMenuList();
+        loadProductTable();
     }
+}
 
-    const newId = products.length > 0 ? Math.max.apply(null, products.map(function(p) { return p.id; })) + 1 : 1;
+function editProduct(productId) {
+    const products = getProducts();
+    const product = products.find(p => p.id === productId);
+    if (!product) return;
+    
+    editingProductId = product.id;
+    
+    // Populate form
+    document.getElementById('new-name').value = product.name;
+    document.getElementById('new-category').value = product.category;
+    document.getElementById('new-price-pc').value = product.pricePerPc || product.price || '';
+    document.getElementById('new-price-kg').value = product.pricePerKg || '';
+    document.getElementById('new-description').value = product.description || '';
+    
+    // Change UI
+    document.getElementById('submit-btn').innerHTML = '&#10004; Update Item';
+    document.getElementById('submit-btn').style.background = '#16a34a'; // Green
+    document.getElementById('submit-btn').style.color = 'white';
+    document.getElementById('cancel-edit-btn').style.display = 'inline-block';
+    
+    // Scroll to form
+    document.getElementById('new-name').scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
 
-    products.push({
-        id:          newId,
-        name:        name,
-        category:    category,
-        pricePerPc:  pricePerPc,
-        pricePerKg:  pricePerKg,
-        description: description,
-        image:       null
-    });
-
-    saveProducts(products);
-
+function cancelEdit() {
+    editingProductId = null;
+    
     // Clear form
     document.getElementById('new-name').value        = '';
     document.getElementById('new-price-pc').value    = '';
     document.getElementById('new-price-kg').value    = '';
     document.getElementById('new-description').value = '';
+    
+    // Revert UI
+    document.getElementById('submit-btn').innerHTML = '&#43; Add Item to Menu';
+    document.getElementById('submit-btn').style.background = 'var(--gold)';
+    document.getElementById('submit-btn').style.color = 'var(--brown-dark)';
+    document.getElementById('cancel-edit-btn').style.display = 'none';
 
     loadMenuList();
     loadProductTable();
-    showMessage('✅ "' + name + '" added to the menu!');
 }
 
 // --- Delete a Product ---
@@ -332,7 +396,10 @@ function loadMenuList() {
                 ${kg ? '<span class="menu-item-price">&#8377;' + kg + '/kg</span>' : ''}
                 ${product.description ? '<span class="menu-item-desc">' + product.description + '</span>' : ''}
             </div>
-            <button class="delete-item-btn" onclick="deleteProduct(${product.id})">&#128465; Remove</button>
+            <div style="display:flex; gap:8px;">
+                <button class="edit-item-btn" onclick="editProduct(${product.id})" style="background:#eab308; color:#fff; border:none; padding:6px 10px; border-radius:4px; cursor:pointer; font-size:0.75rem;">✏️ Edit</button>
+                <button class="delete-item-btn" onclick="deleteProduct(${product.id})">&#128465; Remove</button>
+            </div>
         `;
         container.appendChild(row);
     });
@@ -347,6 +414,14 @@ function clearAllData() {
         loadProductTable();
         showMessage('🗑️ All data has been cleared.');
     }
+}
+
+// --- Logout ---
+function logout() {
+    document.getElementById('password-input').value = '';
+    document.getElementById('admin-panel').style.display = 'none';
+    document.getElementById('login-screen').style.display = 'flex';
+    showMessage('🚪 Logged out securely.');
 }
 
 // --- Show Status Message ---

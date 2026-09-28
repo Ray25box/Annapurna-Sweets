@@ -42,7 +42,10 @@
                 <span class="admin-logo">AS</span>
                 <span>Annapurna Sweets &mdash; Admin Panel</span>
             </div>
-            <a href="index.html" class="view-site-btn">&#128065; View Live Site</a>
+            <div style="display:flex; gap:10px;">
+                <a href="index.html" class="view-site-btn">&#128065; View Live Site</a>
+                <button onclick="logout()" class="logout-btn" style="background:#dc2626; color:white; border:none; padding:8px 14px; border-radius:6px; cursor:pointer; font-weight:600; font-family:Arial,sans-serif; transition:background 0.2s;">&#128682; Logout</button>
+            </div>
         </div>
 
         <div class="admin-body">
@@ -113,7 +116,10 @@
                             <input type="text" id="new-description" placeholder="e.g. Classic Bengali Sweet">
                         </div>
                     </div>
-                    <button onclick="addProduct()" class="add-item-btn">&#43; Add Item to Menu</button>
+                    <div style="display:flex; gap:10px;">
+                        <button onclick="addOrUpdateProduct()" id="submit-btn" class="add-item-btn">&#43; Add Item to Menu</button>
+                        <button onclick="cancelEdit()" id="cancel-edit-btn" style="display:none; background:#888; color:white; border:none; padding:12px 20px; border-radius:8px; cursor:pointer; font-weight:600; font-family:Arial,sans-serif;">Cancel Edit</button>
+                    </div>
                 </div>
 
                 <!-- Current Items List -->
