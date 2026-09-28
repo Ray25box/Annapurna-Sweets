@@ -544,7 +544,6 @@ function loadContactInfo() {
             const info = JSON.parse(infoStr);
             if(document.getElementById('contact-general')) document.getElementById('contact-general').value = info.general || '';
             if(document.getElementById('contact-bulk')) document.getElementById('contact-bulk').value = info.bulk || '';
-            if(document.getElementById('contact-special')) document.getElementById('contact-special').value = info.special || '';
         } catch(e) {}
     }
 }
@@ -552,8 +551,7 @@ function loadContactInfo() {
 function saveContactInfo() {
     const info = {
         general: document.getElementById('contact-general').value.trim(),
-        bulk: document.getElementById('contact-bulk').value.trim(),
-        special: document.getElementById('contact-special').value.trim()
+        bulk: document.getElementById('contact-bulk').value.trim()
     };
     localStorage.setItem('annapurna_contact_info', JSON.stringify(info));
     showMessage('📞 Contact info saved successfully!');
