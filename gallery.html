@@ -35,26 +35,29 @@
 
         <!-- NAVIGATION BAR -->
         <nav class="main-nav">
-            <a href="index.html">HOME</a>
-            <span class="divider">|</span>
-            <a href="#">ABOUT</a>
-            <span class="divider">|</span>
-            <div class="dropdown">
-                <a href="javascript:void(0)">PRODUCTS &#9660;</a>
-                <div class="dropdown-menu">
-                    <a href="menu.html?cat=Sweets">&#127852; Sweets</a>
-                    <a href="menu.html?cat=Snack">&#127840; Snacks</a>
-                    <a href="menu.html?cat=Grocery">&#128717; Grocery</a>
+            <button id="hamburger-btn" class="hamburger-btn">&#9776; MENU</button>
+            <div class="nav-links" id="nav-links">
+                <a href="index.html">HOME</a>
+                <span class="divider">|</span>
+                <a href="#">ABOUT</a>
+                <span class="divider">|</span>
+                <div class="dropdown">
+                    <a href="javascript:void(0)">PRODUCTS &#9660;</a>
+                    <div class="dropdown-menu">
+                        <a href="menu.html?cat=Sweets">&#127852; Sweets</a>
+                        <a href="menu.html?cat=Snack">&#127840; Snacks</a>
+                        <a href="menu.html?cat=Grocery">&#128717; Grocery</a>
+                    </div>
                 </div>
+                <span class="divider">|</span>
+                <a href="#">FESTIVE BOXES</a>
+                <span class="divider">|</span>
+                <a href="gallery.html" style="color:var(--gold); border-bottom:1px solid var(--gold);">GALLERY</a>
+                <span class="divider">|</span>
+                <a href="#">GIFTING</a>
+                <span class="divider">|</span>
+                <a href="#">CONTACT</a>
             </div>
-            <span class="divider">|</span>
-            <a href="#">FESTIVE BOXES</a>
-            <span class="divider">|</span>
-            <a href="gallery.html" style="color:var(--gold); border-bottom:1px solid var(--gold);">GALLERY</a>
-            <span class="divider">|</span>
-            <a href="#">GIFTING</a>
-            <span class="divider">|</span>
-            <a href="#">CONTACT</a>
         </nav>
 
         <!-- GALLERY SECTION -->
@@ -87,12 +90,21 @@
                             return;
                         }
 
-                        // Group products by category
-                        const categories = {
-                            'Sweets': galleryProducts.filter(p => p.category === 'Sweets'),
-                            'Snack': galleryProducts.filter(p => p.category === 'Snack'),
-                            'Grocery': galleryProducts.filter(p => p.category === 'Grocery')
-                        };
+                        // Get dynamic categories
+                        const catsStr = localStorage.getItem('annapurna_categories');
+                        const catList = catsStr ? JSON.parse(catsStr) : ['Sweets', 'Snack', 'Grocery'];
+
+                        // Group products by category dynamically
+                        const categories = {};
+                        catList.forEach(c => {
+                            categories[c] = galleryProducts.filter(p => p.category === c);
+                        });
+
+                        // Also catch any products that might have a category that was deleted or doesn't match
+                        const uncategorized = galleryProducts.filter(p => !catList.includes(p.category));
+                        if (uncategorized.length > 0) {
+                            categories['Other'] = uncategorized;
+                        }
 
                         let html = '';
 
@@ -128,5 +140,17 @@
 
     </div><!-- end .page-frame -->
 
+    <!-- Mobile Menu Toggle Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const hamburger = document.getElementById('hamburger-btn');
+            const navLinks = document.getElementById('nav-links');
+            if (hamburger && navLinks) {
+                hamburger.addEventListener('click', function() {
+                    navLinks.classList.toggle('active');
+                });
+            }
+        });
+    </script>
 </body>
 </html>

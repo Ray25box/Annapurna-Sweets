@@ -11,7 +11,7 @@
     <!-- LOGIN SCREEN -->
     <div id="login-screen" class="login-wrap">
         <div class="login-box">
-            <div class="login-logo">AS</div>
+            <img src="logo.jpg" alt="AS Logo" class="login-logo" style="border: 3px solid var(--gold); object-fit: cover; background: white;">
             <h2>Admin Access</h2>
             <p>Annapurna Sweets Management Panel</p>
 
@@ -39,7 +39,7 @@
         <!-- Top Bar -->
         <div class="admin-topbar">
             <div class="admin-brand">
-                <span class="admin-logo">AS</span>
+                <img src="logo.jpg" alt="AS Logo" class="admin-logo" style="border: 2px solid var(--gold); object-fit: cover; background: white;">
                 <span>Annapurna Sweets &mdash; Admin Panel</span>
             </div>
             <div style="display:flex; gap:10px;">
@@ -163,7 +163,59 @@
 
             </div>
 
-            <!-- Section 4: Change Password -->
+            <!-- Section 4: Manage Categories -->
+            <div class="admin-card">
+                <div class="card-header">
+                    <span class="card-icon">&#128203;</span>
+                    <div>
+                        <h3>Manage Categories</h3>
+                        <p>Add or remove menu categories (e.g. Sweets, Snacks, Beverages).</p>
+                    </div>
+                </div>
+                <div class="edit-form">
+                    <div class="form-row">
+                        <div class="form-group" style="flex:1;">
+                            <input type="text" id="new-category-name" placeholder="New category name (e.g. Namkeen)">
+                        </div>
+                        <div class="form-group" style="flex:0;">
+                            <button onclick="addCategory()" class="add-item-btn" style="white-space:nowrap;">&#43; Add Category</button>
+                        </div>
+                    </div>
+                    <div id="category-list" style="margin-top:16px; display:flex; gap:10px; flex-wrap:wrap;">
+                        <!-- Categories injected here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 5: Store Contact Info -->
+            <div class="admin-card">
+                <div class="card-header">
+                    <span class="card-icon">&#128222;</span>
+                    <div>
+                        <h3>Store Contact Info</h3>
+                        <p>Set the WhatsApp numbers for orders and inquiries on the homepage.</p>
+                    </div>
+                </div>
+                <div class="edit-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>General Inquiries WhatsApp</label>
+                            <input type="text" id="contact-general" placeholder="e.g. 98765 43210">
+                        </div>
+                        <div class="form-group">
+                            <label>Bulk & Catering WhatsApp</label>
+                            <input type="text" id="contact-bulk" placeholder="e.g. 98765 43211">
+                        </div>
+                        <div class="form-group">
+                            <label>Special Occasions WhatsApp</label>
+                            <input type="text" id="contact-special" placeholder="e.g. 98765 43212">
+                        </div>
+                    </div>
+                    <button onclick="saveContactInfo()" class="add-item-btn" style="margin-top:16px;">&#128190; Save Contact Info</button>
+                </div>
+            </div>
+
+            <!-- Section 6: Change Password -->
             <div class="admin-card">
                 <div class="card-header">
                     <span class="card-icon">&#128274;</span>

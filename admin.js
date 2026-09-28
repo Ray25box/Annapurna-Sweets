@@ -27,14 +27,29 @@ async function checkPassword() {
     const enteredHash = await sha256(entered);
 
     if (enteredHash === getPasswordHash()) {
+        sessionStorage.setItem('annapurna_admin_logged_in', 'true');
         document.getElementById('login-screen').style.display = 'none';
         document.getElementById('admin-panel').style.display  = 'block';
         loadProductTable();
         loadMenuList();
+        loadCategories();
+        loadContactInfo();
     } else {
         document.getElementById('login-error').style.display = 'block';
     }
 }
+
+// --- Check Session on Page Load ---
+document.addEventListener('DOMContentLoaded', function() {
+    if (sessionStorage.getItem('annapurna_admin_logged_in') === 'true') {
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('admin-panel').style.display  = 'block';
+        loadProductTable();
+        loadMenuList();
+        loadCategories();
+        loadContactInfo();
+    }
+});
 
 // --- Change Password (called from admin panel) ---
 async function changePassword() {
@@ -443,10 +458,105 @@ function clearAllData() {
 
 // --- Logout ---
 function logout() {
+    sessionStorage.removeItem('annapurna_admin_logged_in');
     document.getElementById('password-input').value = '';
     document.getElementById('admin-panel').style.display = 'none';
     document.getElementById('login-screen').style.display = 'flex';
     showMessage('🚪 Logged out securely.');
+}
+
+// ==========================================
+// CATEGORY MANAGEMENT
+// ==========================================
+const DEFAULT_CATEGORIES = ['Sweets', 'Snack', 'Grocery'];
+
+function getCategories() {
+    const cats = localStorage.getItem('annapurna_categories');
+    return cats ? JSON.parse(cats) : DEFAULT_CATEGORIES;
+}
+
+function saveCategories(cats) {
+    localStorage.setItem('annapurna_categories', JSON.stringify(cats));
+}
+
+function loadCategories() {
+    const cats = getCategories();
+    
+    // 1. Update the display list in admin panel
+    const listEl = document.getElementById('category-list');
+    if (listEl) {
+        listEl.innerHTML = cats.map(c => `
+            <div style="background:#fef3c7; border:1px solid #fde68a; color:#92400e; padding:5px 12px; border-radius:20px; font-size:0.8rem; font-weight:bold; display:flex; align-items:center; gap:8px;">
+                ${c}
+                <button onclick="deleteCategory('${c}')" style="background:transparent; border:none; color:red; cursor:pointer; font-weight:bold;">&times;</button>
+            </div>
+        `).join('');
+    }
+
+    // 2. Update the dropdown in the Add/Edit form
+    const selectEl = document.getElementById('product-category');
+    if (selectEl) {
+        const currentVal = selectEl.value;
+        selectEl.innerHTML = cats.map(c => `<option value="${c}">${c}</option>`).join('');
+        if (cats.includes(currentVal)) selectEl.value = currentVal;
+    }
+}
+
+function addCategory() {
+    const input = document.getElementById('new-category-name');
+    const name = input.value.trim();
+    if (!name) return;
+    
+    const cats = getCategories();
+    if (cats.includes(name)) {
+        showMessage('Category already exists!', 'error');
+        return;
+    }
+    
+    cats.push(name);
+    saveCategories(cats);
+    input.value = '';
+    loadCategories();
+    showMessage(`Added category: ${name}`);
+}
+
+function deleteCategory(name) {
+    if (DEFAULT_CATEGORIES.includes(name)) {
+        if(!confirm(`"${name}" is a default category. Are you sure you want to delete it?`)) return;
+    } else {
+        if(!confirm(`Delete category "${name}"?`)) return;
+    }
+    
+    let cats = getCategories();
+    cats = cats.filter(c => c !== name);
+    saveCategories(cats);
+    loadCategories();
+    showMessage(`Deleted category: ${name}`);
+}
+
+// ==========================================
+// CONTACT INFO MANAGEMENT
+// ==========================================
+function loadContactInfo() {
+    const infoStr = localStorage.getItem('annapurna_contact_info');
+    if (infoStr) {
+        try {
+            const info = JSON.parse(infoStr);
+            if(document.getElementById('contact-general')) document.getElementById('contact-general').value = info.general || '';
+            if(document.getElementById('contact-bulk')) document.getElementById('contact-bulk').value = info.bulk || '';
+            if(document.getElementById('contact-special')) document.getElementById('contact-special').value = info.special || '';
+        } catch(e) {}
+    }
+}
+
+function saveContactInfo() {
+    const info = {
+        general: document.getElementById('contact-general').value.trim(),
+        bulk: document.getElementById('contact-bulk').value.trim(),
+        special: document.getElementById('contact-special').value.trim()
+    };
+    localStorage.setItem('annapurna_contact_info', JSON.stringify(info));
+    showMessage('📞 Contact info saved successfully!');
 }
 
 // --- Show Status Message ---

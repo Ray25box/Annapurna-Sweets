@@ -35,26 +35,29 @@
 
         <!-- NAVIGATION BAR -->
         <nav class="main-nav">
-            <a href="index.html">HOME</a>
-            <span class="divider">|</span>
-            <a href="#">ABOUT</a>
-            <span class="divider">|</span>
-            <div class="dropdown">
-                <a href="javascript:void(0)">PRODUCTS &#9660;</a>
-                <div class="dropdown-menu">
-                    <a href="menu.html?cat=Sweets">&#127852; Sweets</a>
-                    <a href="menu.html?cat=Snack">&#127840; Snacks</a>
-                    <a href="menu.html?cat=Grocery">&#128717; Grocery</a>
+            <button id="hamburger-btn" class="hamburger-btn">&#9776; MENU</button>
+            <div class="nav-links" id="nav-links">
+                <a href="index.html">HOME</a>
+                <span class="divider">|</span>
+                <a href="#">ABOUT</a>
+                <span class="divider">|</span>
+                <div class="dropdown">
+                    <a href="javascript:void(0)">PRODUCTS &#9660;</a>
+                    <div class="dropdown-menu">
+                        <a href="menu.html?cat=Sweets">&#127852; Sweets</a>
+                        <a href="menu.html?cat=Snack">&#127840; Snacks</a>
+                        <a href="menu.html?cat=Grocery">&#128717; Grocery</a>
+                    </div>
                 </div>
+                <span class="divider">|</span>
+                <a href="#">FESTIVE BOXES</a>
+                <span class="divider">|</span>
+                <a href="gallery.html">GALLERY</a>
+                <span class="divider">|</span>
+                <a href="#">GIFTING</a>
+                <span class="divider">|</span>
+                <a href="#">CONTACT</a>
             </div>
-            <span class="divider">|</span>
-            <a href="#">FESTIVE BOXES</a>
-            <span class="divider">|</span>
-            <a href="gallery.html">GALLERY</a>
-            <span class="divider">|</span>
-            <a href="#">GIFTING</a>
-            <span class="divider">|</span>
-            <a href="#">CONTACT</a>
         </nav>
 
         <!-- HERO BANNER -->
@@ -124,7 +127,98 @@
             </script>
         </section>
 
+        <!-- INQUIRY SECTION -->
+        <section class="order-section" id="order-section">
+            <h2 class="order-section-title">Contact Us For Inquiries</h2>
+            <div class="order-grid">
+                
+                <!-- Card 1 -->
+                <div class="order-card">
+                    <div class="order-icon">&#127854;</div> <!-- Bowl of sweets -->
+                    <h3>General Inquiries</h3>
+                    <p>Savor tradition with every bite. Handcrafted delights from Annapurna Sweets.</p>
+                    <a href="#" class="wa-btn" id="wa-btn-general">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp">
+                        <div>
+                            <span>WhatsApp</span>
+                            <strong id="wa-txt-general">Not Available</strong>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="order-card">
+                    <div class="order-icon">&#127873;</div> <!-- Gift boxes -->
+                    <h3>Bulk & Corporate Catering</h3>
+                    <p>Savor tradition with every bite. Handcrafted delights from Annapurna Sweets.</p>
+                    <a href="#" class="wa-btn" id="wa-btn-bulk">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp">
+                        <div>
+                            <span>WhatsApp</span>
+                            <strong id="wa-txt-bulk">Not Available</strong>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="order-card">
+                    <div class="order-icon">&#127872;</div> <!-- Decorative tray -->
+                    <h3>Special Occasions & Weddings</h3>
+                    <p>Savor tradition with every bite. Handcrafted delights from Annapurna Sweets.</p>
+                    <a href="#" class="wa-btn" id="wa-btn-special">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp">
+                        <div>
+                            <span>WhatsApp</span>
+                            <strong id="wa-txt-special">Not Available</strong>
+                        </div>
+                    </a>
+                </div>
+
+            </div>
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    const infoStr = localStorage.getItem('annapurna_contact_info');
+                    if (infoStr) {
+                        try {
+                            const info = JSON.parse(infoStr);
+                            
+                            const setupBtn = (type, number) => {
+                                const btn = document.getElementById('wa-btn-' + type);
+                                const txt = document.getElementById('wa-txt-' + type);
+                                if (number) {
+                                    txt.innerText = number;
+                                    // Remove spaces for the link
+                                    const cleanNum = number.replace(/\D/g, '');
+                                    btn.href = 'https://wa.me/91' + cleanNum;
+                                } else {
+                                    btn.style.opacity = '0.5';
+                                    btn.style.pointerEvents = 'none';
+                                }
+                            };
+                            
+                            setupBtn('general', info.general);
+                            setupBtn('bulk', info.bulk);
+                            setupBtn('special', info.special);
+
+                        } catch(e) {}
+                    }
+                });
+            </script>
+        </section>
+
     </div><!-- end .page-frame -->
 
+    <!-- Mobile Menu Toggle Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const hamburger = document.getElementById('hamburger-btn');
+            const navLinks = document.getElementById('nav-links');
+            if (hamburger && navLinks) {
+                hamburger.addEventListener('click', function() {
+                    navLinks.classList.toggle('active');
+                });
+            }
+        });
+    </script>
 </body>
 </html>
