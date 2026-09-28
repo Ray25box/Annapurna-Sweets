@@ -69,7 +69,7 @@ button { cursor: pointer; font-family: Arial, sans-serif; }
 .input-group label { display: block; font-size: 0.8rem; font-weight: 700; color: #555; margin-bottom: 6px; }
 .input-group input {
     width: 100%;
-    padding: 12px 16px;
+    padding: 12px 44px 12px 16px;
     border: 2px solid var(--gray-border);
     border-radius: 10px;
     font-size: 1rem;
@@ -77,6 +77,26 @@ button { cursor: pointer; font-family: Arial, sans-serif; }
     transition: border-color 0.2s;
 }
 .input-group input:focus { border-color: var(--gold); }
+
+/* Password wrapper + eye toggle */
+.pw-wrap { position: relative; }
+.pw-wrap input { padding-right: 44px; }
+.pw-eye {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.1rem;
+    color: #aaa;
+    padding: 4px;
+    line-height: 1;
+    transition: color 0.2s;
+    user-select: none;
+}
+.pw-eye:hover { color: var(--brown-dark); }
 
 .error-msg {
     background: #fef2f2;
@@ -336,3 +356,124 @@ button { cursor: pointer; font-family: Arial, sans-serif; }
     transition: opacity 0.2s;
 }
 .danger-btn:hover { opacity: 0.85; }
+
+/* =============================================
+   EDIT MENU FORM
+   ============================================= */
+.edit-form {
+    background: #f9fafb;
+    border: 1px solid var(--gray-border);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 24px;
+}
+
+.form-row {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-width: 140px;
+}
+.form-group.full-width { flex: 1 1 100%; }
+
+.form-group label {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: #555;
+    margin-bottom: 6px;
+    letter-spacing: 0.03em;
+}
+.required { color: var(--red); }
+
+.form-group input,
+.form-group select {
+    padding: 10px 14px;
+    border: 1.5px solid var(--gray-border);
+    border-radius: 8px;
+    font-size: 0.88rem;
+    font-family: Arial, sans-serif;
+    color: #333;
+    outline: none;
+    transition: border-color 0.2s;
+    background: white;
+}
+.form-group input:focus,
+.form-group select:focus { border-color: var(--gold); }
+
+.add-item-btn {
+    background: var(--green, #16a34a);
+    color: white;
+    border: none;
+    padding: 11px 28px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    transition: opacity 0.2s, transform 0.2s;
+}
+.add-item-btn:hover { opacity: 0.88; transform: translateY(-1px); }
+
+/* Menu Items List */
+.menu-list-wrap { border-top: 1px solid var(--gray-border); padding-top: 20px; }
+
+.menu-list-title {
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: #555;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 12px;
+}
+
+.menu-list { display: flex; flex-direction: column; gap: 8px; }
+
+.menu-item-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: white;
+    border: 1px solid var(--gray-border);
+    border-radius: 10px;
+    padding: 10px 16px;
+    gap: 12px;
+    transition: box-shadow 0.2s;
+}
+.menu-item-row:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.07); }
+
+.menu-item-info { display: flex; align-items: center; gap: 12px; flex: 1; flex-wrap: wrap; }
+
+.menu-item-name { font-weight: 700; color: #222; font-size: 0.92rem; }
+
+.menu-item-cat {
+    background: #fef9ef;
+    border: 1px solid #fde68a;
+    color: #92400e;
+    padding: 2px 10px;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: 700;
+}
+
+.menu-item-price { color: var(--gold); font-weight: 700; font-size: 0.88rem; }
+
+.menu-item-desc { color: #aaa; font-size: 0.78rem; font-style: italic; }
+
+.delete-item-btn {
+    background: none;
+    border: 1.5px solid #fecaca;
+    color: var(--red);
+    padding: 6px 14px;
+    border-radius: 8px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    flex-shrink: 0;
+    transition: background 0.2s, color 0.2s;
+}
+.delete-item-btn:hover { background: var(--red); color: white; }

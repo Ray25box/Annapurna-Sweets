@@ -17,7 +17,10 @@
 
             <div class="input-group">
                 <label>Password</label>
-                <input type="password" id="password-input" placeholder="Enter admin password">
+                <div class="pw-wrap">
+                    <input type="password" id="password-input" placeholder="Enter admin password">
+                    <button type="button" class="pw-eye" onclick="togglePw('password-input', this)" title="Show/Hide password">&#128065;</button>
+                </div>
             </div>
 
             <div id="login-error" class="error-msg" style="display:none;">
@@ -59,9 +62,9 @@
 
                 <div class="excel-format-hint">
                     <strong>Excel Column Format:</strong>
-                    <code>Name &nbsp;|&nbsp; Category &nbsp;|&nbsp; Price &nbsp;|&nbsp; Description</code>
+                    <code>Name &nbsp;|&nbsp; Category &nbsp;|&nbsp; Price_Per_Pc &nbsp;|&nbsp; Price_Per_Kg &nbsp;|&nbsp; Description</code>
                     <br>
-                    <small>Category must be: <strong>Sweets</strong>, <strong>Snack</strong>, or <strong>Grocery</strong></small>
+                    <small>Category must be: <strong>Sweets</strong>, <strong>Snack</strong>, or <strong>Grocery</strong> &nbsp;&bull;&nbsp; Leave price blank if not applicable</small>
                 </div>
 
                 <label class="file-upload-label">
@@ -70,7 +73,59 @@
                 </label>
             </div>
 
-            <!-- Section 2: Product Management Table -->
+            <!-- Section 2: Edit Menu (Add / Remove Items) -->
+            <div class="admin-card">
+                <div class="card-header">
+                    <span class="card-icon">&#9998;</span>
+                    <div>
+                        <h3>Edit Menu</h3>
+                        <p>Add or remove items directly — no Excel file needed.</p>
+                    </div>
+                </div>
+
+                <!-- Add New Item Form -->
+                <div class="edit-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Item Name <span class="required">*</span></label>
+                            <input type="text" id="new-name" placeholder="e.g. Rasgulla">
+                        </div>
+                        <div class="form-group">
+                            <label>Category <span class="required">*</span></label>
+                            <select id="new-category">
+                                <option value="Sweets">Sweets</option>
+                                <option value="Snack">Snack</option>
+                                <option value="Grocery">Grocery</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Price / Pc (&#8377;)</label>
+                            <input type="text" id="new-price-pc" placeholder="e.g. 25">
+                        </div>
+                        <div class="form-group">
+                            <label>Price / kg (&#8377;)</label>
+                            <input type="text" id="new-price-kg" placeholder="e.g. 480">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group full-width">
+                            <label>Description</label>
+                            <input type="text" id="new-description" placeholder="e.g. Classic Bengali Sweet">
+                        </div>
+                    </div>
+                    <button onclick="addProduct()" class="add-item-btn">&#43; Add Item to Menu</button>
+                </div>
+
+                <!-- Current Items List -->
+                <div class="menu-list-wrap">
+                    <h4 class="menu-list-title">Current Menu Items</h4>
+                    <div id="menu-list" class="menu-list">
+                        <p class="empty-row" style="padding:16px;font-style:italic;color:#aaa;">No items yet.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 3: Product Management Table -->
             <div class="admin-card">
                 <div class="card-header">
                     <span class="card-icon">&#128247;</span>
@@ -93,10 +148,50 @@
                         </thead>
                         <tbody id="product-table-body">
                             <tr>
-                                <td colspan="5" class="empty-row">No products yet. Upload an Excel sheet above to get started.</td>
+                                <td colspan="5" class="empty-row">No products yet. Upload an Excel sheet or add items using Edit Menu above.</td>
                             </tr>
                         </tbody>
                     </table>
+                </div>
+
+            </div>
+
+            <!-- Section 4: Change Password -->
+            <div class="admin-card">
+                <div class="card-header">
+                    <span class="card-icon">&#128274;</span>
+                    <div>
+                        <h3>Change Password</h3>
+                        <p>Update your admin login password at any time.</p>
+                    </div>
+                </div>
+
+                <div class="edit-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Current Password <span class="required">*</span></label>
+                            <div class="pw-wrap">
+                                <input type="password" id="cp-current" placeholder="Enter current password">
+                                <button type="button" class="pw-eye" onclick="togglePw('cp-current', this)" title="Show/Hide">&#128065;</button>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>New Password <span class="required">*</span></label>
+                            <div class="pw-wrap">
+                                <input type="password" id="cp-new" placeholder="Min. 6 characters">
+                                <button type="button" class="pw-eye" onclick="togglePw('cp-new', this)" title="Show/Hide">&#128065;</button>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Confirm New Password <span class="required">*</span></label>
+                            <div class="pw-wrap">
+                                <input type="password" id="cp-confirm" placeholder="Re-enter new password">
+                                <button type="button" class="pw-eye" onclick="togglePw('cp-confirm', this)" title="Show/Hide">&#128065;</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="cp-message" style="display:none; padding:10px 14px; border-radius:8px; border:1px solid; font-size:0.85rem; font-weight:600; margin-bottom:12px;"></div>
+                    <button onclick="changePassword()" class="add-item-btn">&#128274; Update Password</button>
                 </div>
             </div>
 

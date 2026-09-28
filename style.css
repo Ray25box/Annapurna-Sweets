@@ -209,6 +209,101 @@ img { display: block; width: 100%; object-fit: cover; }
 .dropdown-menu a:hover { background: #fef0d4; color: var(--brown-dark); }
 .dropdown:hover .dropdown-menu { display: block; }
 
+/* Override: mega-menu is JS-controlled, not CSS-hover */
+.dropdown:hover .mega-menu { display: none; }
+.mega-menu.open             { display: block !important; }
+
+/* =============================================
+   MEGA MENU
+   ============================================= */
+.mega-menu {
+    min-width: 520px;
+    padding: 0;
+    border-radius: 0 0 12px 12px;
+    overflow: hidden;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+/* Tab bar */
+.mega-tabs {
+    display: flex;
+    background: var(--brown-dark);
+    border-bottom: 2px solid var(--gold);
+}
+
+.mega-tab {
+    flex: 1;
+    padding: 11px 6px;
+    background: none;
+    border: none;
+    border-right: 1px solid rgba(255,255,255,0.1);
+    color: rgba(254,243,199,0.7);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    font-family: Arial, sans-serif;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+}
+.mega-tab:last-child { border-right: none; }
+.mega-tab:hover  { background: rgba(255,255,255,0.1); color: var(--gold-light); }
+.mega-tab.active { background: var(--gold); color: var(--brown-dark); }
+
+/* Content panels */
+.mega-content         { display: none; max-height: 280px; overflow-y: auto; }
+.mega-content.active  { display: block; }
+
+/* Menu table */
+.menu-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: Arial, sans-serif;
+}
+.menu-table thead tr {
+    background: #fef4e0;
+    border-bottom: 2px solid var(--cream-border);
+    position: sticky;
+    top: 0;
+}
+.menu-table th {
+    padding: 9px 16px;
+    text-align: left;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--text-brown);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+.menu-table th:nth-child(2),
+.menu-table th:nth-child(3) { text-align: right; }
+
+.menu-table td {
+    padding: 9px 16px;
+    font-size: 0.82rem;
+    color: #444;
+    border-bottom: 1px solid var(--cream-border);
+}
+.menu-table tbody tr:last-child td { border-bottom: none; }
+.menu-table tbody tr:nth-child(even) { background: #fdf8f0; }
+.menu-table tbody tr:hover { background: #fef0d4; }
+
+/* Column alignment */
+.menu-table td:nth-child(1) { font-weight: 600; color: var(--text-brown); }
+.menu-table td:nth-child(2),
+.menu-table td:nth-child(3) { text-align: right; color: var(--gold); font-weight: 700; }
+
+.menu-empty {
+    text-align: center !important;
+    color: #bbb;
+    font-style: italic;
+    padding: 20px !important;
+    font-weight: normal !important;
+}
+
+
+
 /* =============================================
    HERO BANNER
    ============================================= */
