@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gallery - Annapurna Sweets</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- OUTER DECORATIVE FRAME -->
+    <div class="page-frame">
+
+        <!-- TOP HEADER: Logo + Icons -->
+        <header class="top-header">
+            <div class="header-icons left-icons">
+                <button class="icon-btn">&#128269;</button>
+            </div>
+
+            <div class="logo-center">
+                <img src="logo.jpg" alt="AS Logo" class="logo-img" onerror="this.style.display='none'; document.getElementById('logo-fallback').style.display='flex';">
+                <div id="logo-fallback" class="logo-fallback">AS</div>
+                <h1 class="brand-name">ANNAPURNA SWEETS</h1>
+                <p class="brand-tagline">Authentic Bengali Sweets</p>
+            </div>
+
+            <div class="header-icons right-icons">
+                <button class="icon-btn">&#128100;</button>
+                <button class="icon-btn cart-btn">
+                    &#128722;
+                    <span class="cart-badge">1</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- NAVIGATION BAR -->
+        <nav class="main-nav">
+            <a href="index.html">HOME</a>
+            <span class="divider">|</span>
+            <a href="#">ABOUT</a>
+            <span class="divider">|</span>
+            <div class="dropdown">
+                <a href="javascript:void(0)">PRODUCTS &#9660;</a>
+                <div class="dropdown-menu">
+                    <a href="menu.html?cat=Sweets">&#127852; Sweets</a>
+                    <a href="menu.html?cat=Snack">&#127840; Snacks</a>
+                    <a href="menu.html?cat=Grocery">&#128717; Grocery</a>
+                </div>
+            </div>
+            <span class="divider">|</span>
+            <a href="#">FESTIVE BOXES</a>
+            <span class="divider">|</span>
+            <a href="gallery.html" style="color:var(--gold); border-bottom:1px solid var(--gold);">GALLERY</a>
+            <span class="divider">|</span>
+            <a href="#">GIFTING</a>
+            <span class="divider">|</span>
+            <a href="#">CONTACT</a>
+        </nav>
+
+        <!-- GALLERY SECTION -->
+        <section class="catalog" style="padding-top: 40px; padding-bottom: 60px;">
+            <h2 class="catalog-title">PHOTO GALLERY</h2>
+            <p style="text-align: center; color: var(--text-brown); margin-bottom: 20px; font-style: italic;">
+                A visual showcase of all our authentic delicacies.
+            </p>
+
+            <div id="full-gallery-container" style="width: 100%; max-width: 1200px; margin: 0 auto; padding: 0 20px;">
+                <!-- Dynamically loaded by JavaScript -->
+            </div>
+            
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    const container = document.getElementById('full-gallery-container');
+                    const productsStr = localStorage.getItem('annapurna_products');
+                    
+                    if (!productsStr) {
+                        container.innerHTML = '<p style="text-align: center; color: #8b3a1a; padding: 40px; font-style: italic;">No images available yet.</p>';
+                        return;
+                    }
+
+                    try {
+                        const allProducts = JSON.parse(productsStr);
+                        const galleryProducts = allProducts.filter(p => p.image);
+
+                        if (galleryProducts.length === 0) {
+                            container.innerHTML = '<p style="text-align: center; color: #8b3a1a; padding: 40px; font-style: italic;">No images available yet. Admin can upload photos in the dashboard.</p>';
+                            return;
+                        }
+
+                        // Group products by category
+                        const categories = {
+                            'Sweets': galleryProducts.filter(p => p.category === 'Sweets'),
+                            'Snack': galleryProducts.filter(p => p.category === 'Snack'),
+                            'Grocery': galleryProducts.filter(p => p.category === 'Grocery')
+                        };
+
+                        let html = '';
+
+                        for (const [catName, items] of Object.entries(categories)) {
+                            if (items.length > 0) {
+                                const displayName = catName === 'Snack' ? 'Snacks' : catName;
+                                html += `<h3 style="text-align:center; color:#6b2a0e; margin: 40px 0 20px; font-family:'Playfair Display',serif; font-size:1.8rem; border-bottom: 2px solid #e8d5b0; padding-bottom:10px;">${displayName}</h3>`;
+                                html += '<div class="product-grid">';
+                                html += items.map(p => {
+                                    const desc = p.description || p.category;
+                                    return `
+                                        <div class="product-card">
+                                            <div class="product-img">
+                                                <img src="${p.image}" alt="${p.name}">
+                                            </div>
+                                            <h3>${p.name.toUpperCase()}</h3>
+                                            <p>${desc}</p>
+                                        </div>
+                                    `;
+                                }).join('');
+                                html += '</div>';
+                            }
+                        }
+
+                        container.innerHTML = html;
+
+                    } catch (e) {
+                        container.innerHTML = '<p style="text-align:center;color:red;">Error loading gallery.</p>';
+                    }
+                });
+            </script>
+        </section>
+
+    </div><!-- end .page-frame -->
+
+</body>
+</html>

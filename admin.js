@@ -204,10 +204,35 @@ function loadProductTable() {
                 </label>
                 ${removeBtn}
             </td>
+            <td style="text-align:center;">
+                <input type="checkbox" onchange="toggleFeature(${product.id}, this)" ${product.isFeatured ? 'checked' : ''} ${!product.image ? 'disabled title="Upload a photo first"' : ''} style="width:18px;height:18px;cursor:pointer;">
+            </td>
         `;
         tbody.appendChild(tr);
     });
 }
+
+// --- Toggle Feature on Home ---
+window.toggleFeature = function(productId, checkbox) {
+    const products = getProducts();
+    
+    // Check if we are trying to add and already have 12 featured
+    if (checkbox.checked) {
+        const currentFeatured = products.filter(p => p.isFeatured).length;
+        if (currentFeatured >= 12) {
+            checkbox.checked = false;
+            showMessage('⚠️ You can only feature a maximum of 12 items on the homepage.', 'error');
+            return;
+        }
+    }
+    
+    const idx = products.findIndex(p => p.id === productId);
+    if (idx !== -1) {
+        products[idx].isFeatured = checkbox.checked;
+        saveProducts(products);
+        showMessage(checkbox.checked ? '⭐ Added to Homepage!' : 'Removed from Homepage.');
+    }
+};
 
 // --- Handle Image Upload for a Product ---
 function handleImageUpload(event, productId) {

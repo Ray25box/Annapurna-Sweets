@@ -35,7 +35,7 @@
 
         <!-- NAVIGATION BAR -->
         <nav class="main-nav">
-            <a href="#">HOME</a>
+            <a href="index.html">HOME</a>
             <span class="divider">|</span>
             <a href="#">ABOUT</a>
             <span class="divider">|</span>
@@ -50,7 +50,7 @@
             <span class="divider">|</span>
             <a href="#">FESTIVE BOXES</a>
             <span class="divider">|</span>
-            <a href="#">GALLERY</a>
+            <a href="gallery.html">GALLERY</a>
             <span class="divider">|</span>
             <a href="#">GIFTING</a>
             <span class="divider">|</span>
@@ -78,97 +78,50 @@
         <section class="catalog" id="catalog">
             <h2 class="catalog-title">OUR SIGNATURE SWEETS</h2>
 
-            <div class="product-grid">
-
-                <!-- Card 1 -->
-                <div class="product-card">
-                    <span class="card-number">1</span>
-                    <div class="product-img">
-                        <img src="https://images.unsplash.com/photo-1627885078519-21cb8b776a39?w=400&q=80" alt="Motichoor Laddu">
-                    </div>
-                    <h3>MOTICHOOR LADDU</h3>
-                    <p>Ghee-infused &amp; Delicious</p>
-                    <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
-                </div>
-
-                <!-- Card 2 -->
-                <div class="product-card">
-                    <span class="card-number">2</span>
-                    <div class="product-img">
-                        <img src="https://images.unsplash.com/photo-1666897440416-b7e5de9c1b1a?w=400&q=80" alt="Kaju Katli">
-                    </div>
-                    <h3>KAJU KATLI</h3>
-                    <p>Classic &amp; Rich</p>
-                    <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
-                </div>
-
-                <!-- Card 3 -->
-                <div class="product-card">
-                    <span class="card-number">3</span>
-                    <div class="product-img">
-                        <img src="https://images.unsplash.com/photo-1605197788044-3d52f7e54bb2?w=400&q=80" alt="Gulab Jamun">
-                    </div>
-                    <h3>GULAB JAMUN</h3>
-                    <p>Soft &amp; Syrupy</p>
-                    <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
-                </div>
-
-                <!-- Card 4 -->
-                <div class="product-card">
-                    <span class="card-number">4</span>
-                    <div class="product-img">
-                        <img src="https://images.unsplash.com/photo-1549497538-303791108f95?w=400&q=80" alt="Special Assortment">
-                    </div>
-                    <h3>SPECIAL ASSORTMENT</h3>
-                    <p>Festive Gift Box</p>
-                    <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
-                </div>
-
-                <!-- Card 5 -->
-                <div class="product-card">
-                    <span class="card-number">5</span>
-                    <div class="product-img">
-                        <img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&q=80" alt="Rasgulla">
-                    </div>
-                    <h3>RASGULLA</h3>
-                    <p>Classic Bengali Sweet</p>
-                    <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
-                </div>
-
-                <!-- Card 6 -->
-                <div class="product-card">
-                    <span class="card-number">6</span>
-                    <div class="product-img">
-                        <img src="https://images.unsplash.com/photo-1633945274405-b86c3a56aa10?w=400&q=80" alt="Sondesh">
-                    </div>
-                    <h3>SONDESH</h3>
-                    <p>Artisanal Bengali Sweet</p>
-                    <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
-                </div>
-
-                <!-- Card 7 -->
-                <div class="product-card">
-                    <span class="card-number">7</span>
-                    <div class="product-img">
-                        <img src="https://images.unsplash.com/photo-1601050690117-94f5f6fa8bd7?w=400&q=80" alt="Cham Cham">
-                    </div>
-                    <h3>CHAM CHAM</h3>
-                    <p>Rich Bengali Sweet</p>
-                    <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
-                </div>
-
-                <!-- Card 8 -->
-                <div class="product-card">
-                    <span class="card-number">8</span>
-                    <div class="product-img">
-                        <img src="https://images.unsplash.com/photo-1571167530149-c1105da4c2c0?w=400&q=80" alt="Mishti Doi">
-                    </div>
-                    <h3>MISHTI DOI</h3>
-                    <p>Classic Bengali Sweet Curd</p>
-                    <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
-                </div>
-
+            <div class="product-grid" id="featured-products-grid">
+                <!-- Dynamically loaded by JavaScript -->
             </div>
+            
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    const grid = document.getElementById('featured-products-grid');
+                    const productsStr = localStorage.getItem('annapurna_products');
+                    
+                    if (!productsStr) {
+                        grid.innerHTML = '<p style="grid-column: 1 / -1; text-align: center; color: #8b3a1a; padding: 40px; font-style: italic;">No featured items yet. Admin can upload photos in the dashboard to feature products here.</p>';
+                        return;
+                    }
+
+                    try {
+                        const allProducts = JSON.parse(productsStr);
+                        // Filter for items with images AND marked as featured
+                        const featuredProducts = allProducts.filter(p => p.image && p.isFeatured);
+
+                        if (featuredProducts.length === 0) {
+                            grid.innerHTML = '<p style="grid-column: 1 / -1; text-align: center; color: #8b3a1a; padding: 40px; font-style: italic;">No featured items yet. Admin can upload photos in the dashboard to feature products here.</p>';
+                            return;
+                        }
+
+                        grid.innerHTML = featuredProducts.map((p, index) => {
+                            const desc = p.description || p.category;
+                            return `
+                                <div class="product-card">
+                                    <span class="card-number">${index + 1}</span>
+                                    <div class="product-img">
+                                        <img src="${p.image}" alt="${p.name}">
+                                    </div>
+                                    <h3>${p.name.toUpperCase()}</h3>
+                                    <p>${desc}</p>
+                                    <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+                                </div>
+                            `;
+                        }).join('');
+
+                    } catch (e) {
+                        grid.innerHTML = '<p>Error loading featured products.</p>';
+                    }
+                });
+            </script>
         </section>
 
     </div><!-- end .page-frame -->
