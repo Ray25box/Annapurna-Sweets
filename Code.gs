@@ -20,7 +20,7 @@
  */
 
 // 🔒 Default Admin Password (you can also change this anytime from admin.html)
-var DEFAULT_ADMIN_PASSWORD = 'Annapurna@Admin2024';
+var DEFAULT_ADMIN_PASSWORD = 'AnnapurnaSweets@2024';
 
 function getAdminPassword() {
   var stored = PropertiesService.getScriptProperties().getProperty('ADMIN_PASSWORD');

@@ -33,12 +33,28 @@ async function sheetWrite(payload) {
         const bodyData = Object.assign({}, payload, { token: token });
         const res = await fetch(SCRIPT_URL, {
             method: 'POST',
+            headers: {
+                'Content-Type': 'text/plain;charset=utf-8'
+            },
+            redirect: 'follow',
             body: JSON.stringify(bodyData)
         });
         if (!res.ok) throw new Error('HTTP ' + res.status);
         return await res.json();
     } catch (e) {
         console.error('Annapurna Admin Write Error:', e);
+        if (e.message && e.message.toLowerCase().includes('failed to fetch')) {
+            if (window.location.protocol === 'file:') {
+                return { 
+                    status: 'error', 
+                    message: 'Browser blocked connection from local file (file://). Please check Apps Script access is "Anyone" and run via local server or your hosted GitHub/Netlify link.' 
+                };
+            }
+            return { 
+                status: 'error', 
+                message: 'Failed to connect to Google Apps Script. Ensure deployment is set to "Execute as: Me" and "Who has access: Anyone".' 
+            };
+        }
         return { status: 'error', message: e.message || 'Connection failed' };
     }
 }
