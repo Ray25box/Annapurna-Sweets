@@ -1,32 +1,51 @@
 /**
  * ============================================================
- * Annapurna Sweets — Google Apps Script Backend
+ * Annapurna Sweets — Secure Google Apps Script Backend
  * ============================================================
+ * Only the Store Owner can make changes using the Admin Password.
+ * Requests without the correct Admin Password will be rejected.
+ *
  * HOW TO DEPLOY:
  *   1. Open your Google Sheet.
  *   2. Click Extensions → Apps Script.
- *   3. Delete any existing code, paste this entire file.
- *   4. Click Deploy → New Deployment.
- *   5. Type: Web App
- *   6. Execute as: Me
- *   7. Who has access: Anyone
- *   8. Click Deploy → Copy the Web App URL.
- *   9. Paste that URL as SCRIPT_URL in sheets.js.
+ *   3. Replace all code with this file.
+ *   4. (Optional) Customize DEFAULT_ADMIN_PASSWORD below.
+ *   5. Click Deploy → New Deployment (or Manage Deployments → Edit → New Version).
+ *   6. Type: Web App
+ *   7. Execute as: Me
+ *   8. Who has access: Anyone
+ *   9. Click Deploy → Copy the Web App URL.
+ *   10. Paste that URL into SCRIPT_URL in admin.js.
  * ============================================================
  */
+
+// 🔒 Default Admin Password (you can also change this anytime from admin.html)
+var DEFAULT_ADMIN_PASSWORD = 'Annapurna@Admin2024';
+
+function getAdminPassword() {
+  var stored = PropertiesService.getScriptProperties().getProperty('ADMIN_PASSWORD');
+  return stored || DEFAULT_ADMIN_PASSWORD;
+}
 
 // ---- Entry points ----
 
 function doGet(e) {
   return ContentService
-    .createTextOutput('Annapurna Sweets API is running ✓')
+    .createTextOutput('Annapurna Sweets API is running (Protected).')
     .setMimeType(ContentService.MimeType.TEXT);
 }
 
 function doPost(e) {
   try {
-    var data = JSON.parse(e.postData.contents);
-    var ss   = SpreadsheetApp.getActiveSpreadsheet();
+    var data = JSON.parse(e.postData.contents || '{}');
+
+    // 🔒 Security Check: Every write or admin action requires the valid Admin Password token.
+    var currentPassword = getAdminPassword();
+    if (!data.token || String(data.token).trim() !== currentPassword) {
+      return json({ status: 'error', message: 'Unauthorized: Invalid or missing admin password.' });
+    }
+
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
     var result = dispatch(ss, data);
     return json(result);
   } catch (err) {
@@ -44,6 +63,8 @@ function json(obj) {
 
 function dispatch(ss, data) {
   switch (data.action) {
+    case 'authCheck':             return { status: 'ok', message: 'Authenticated' };
+    case 'changePassword':        return changePassword(data);
     case 'addProduct':            return addProduct(ss, data);
     case 'updateProduct':         return updateProduct(ss, data);
     case 'deleteProduct':         return deleteProduct(ss, data);
@@ -56,12 +77,21 @@ function dispatch(ss, data) {
   }
 }
 
+// ---- Password Change Action ----
+
+function changePassword(d) {
+  if (!d.newPassword || String(d.newPassword).trim().length < 6) {
+    return { status: 'error', message: 'New password must be at least 6 characters.' };
+  }
+  PropertiesService.getScriptProperties().setProperty('ADMIN_PASSWORD', String(d.newPassword).trim());
+  return { status: 'ok', message: 'Password changed successfully.' };
+}
+
 // ---- Sheet helpers ----
 
 function getSheet(ss, name) {
   var sheet = ss.getSheetByName(name);
   if (!sheet) {
-    // Auto-create sheet with headers on first use
     sheet = ss.insertSheet(name);
     if (name === 'Products') {
       sheet.getRange(1, 1, 1, 7)
@@ -104,7 +134,6 @@ function updateProduct(ss, d) {
   var row   = findRow(sheet, d.originalName || d.Name);
   if (row === -1) return { status: 'error', message: 'Product not found: ' + d.Name };
 
-  // Read current row to preserve any fields not sent in the request
   var current = sheet.getRange(row, 1, 1, 7).getValues()[0];
 
   sheet.getRange(row, 1, 1, 7).setValues([[
@@ -127,14 +156,13 @@ function deleteProduct(ss, d) {
   return { status: 'ok' };
 }
 
-// ---- Image upload ----
+// ---- Image upload to Google Drive ----
 
 function uploadImage(ss, d) {
   try {
-    var decoded  = Utilities.base64Decode(d.base64);
-    var blob     = Utilities.newBlob(decoded, d.mimeType || 'image/jpeg', d.filename || 'product.jpg');
+    var decoded = Utilities.base64Decode(d.base64);
+    var blob    = Utilities.newBlob(decoded, d.mimeType || 'image/jpeg', d.filename || 'product.jpg');
 
-    // Find or create an "Annapurna Sweets Images" folder in Drive
     var folderName = 'Annapurna Sweets Images';
     var iter = DriveApp.getFoldersByName(folderName);
     var folder = iter.hasNext() ? iter.next() : DriveApp.createFolder(folderName);
@@ -178,7 +206,6 @@ function saveConfig(ss, d) {
 function bulkImport(ss, d) {
   var sheet = getSheet(ss, 'Products');
 
-  // Remember existing image URLs and featured flags so they aren't lost
   var memo = {};
   var curr = sheet.getDataRange().getValues();
   for (var i = 1; i < curr.length; i++) {
@@ -186,12 +213,10 @@ function bulkImport(ss, d) {
     if (nm) memo[nm.toLowerCase()] = { url: curr[i][5], featured: curr[i][6] };
   }
 
-  // Clear product rows (keep header)
   if (sheet.getLastRow() > 1) {
     sheet.getRange(2, 1, sheet.getLastRow() - 1, 7).clearContent();
   }
 
-  // Write new rows
   var products = d.products || [];
   products.forEach(function (p) {
     var prev = memo[(p.Name || '').trim().toLowerCase()] || {};

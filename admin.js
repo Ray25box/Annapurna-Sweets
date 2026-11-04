@@ -1,56 +1,97 @@
 // =============================================
-// Annapurna Sweets — Admin Panel
-// Google Sheets Edition
+// Annapurna Sweets — Secure Admin Panel Controller
+// (Only loaded on admin.html — NEVER loaded on customer pages)
 // =============================================
 
-// --- Password: SHA-256 hash of default password ---
-// Plain-text password is NEVER stored here.
-const DEFAULT_PASSWORD_HASH = '6714ed55bd7f9dbb38016e24e54b5f142bf1e6d73a9eab9032ae0822969d171f';
-const PASSWORD_STORAGE      = 'annapurna_admin_password_hash';
+// 🔧 The Google Apps Script Web App URL for executing admin write operations:
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx8PBszOt1QbBG-nvPQLNHlA3VEQc3GM0L4DhEuhXLKUKIKTw3mGyPDqaWFAV24HCTsaA/exec';
 
-// --- In-memory product list (populated from Google Sheets after login) ---
 var adminProducts     = [];
-var editingProductIdx = null;   // null = adding new, number = editing existing
+var editingProductIdx = null;
 
 // =============================================
-// PASSWORD SYSTEM
+// AUTHENTICATION & SECURE WRITE LAYER
 // =============================================
 
-async function sha256(message) {
-    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(message));
-    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+function getAdminToken() {
+    return sessionStorage.getItem('annapurna_admin_token') || '';
 }
 
-function getPasswordHash() {
-    return localStorage.getItem(PASSWORD_STORAGE) || DEFAULT_PASSWORD_HASH;
+/**
+ * Executes a write operation against Google Apps Script.
+ * Automatically injects the active Admin Password token for authorization.
+ */
+async function sheetWrite(payload) {
+    if (!SCRIPT_URL || SCRIPT_URL === 'YOUR_APPS_SCRIPT_URL_HERE') {
+        return { status: 'error', message: 'Script URL not configured in admin.js' };
+    }
+    const token = payload.token || getAdminToken();
+    if (!token && payload.action !== 'authCheck') {
+        return { status: 'error', message: 'Unauthorized. Please login first.' };
+    }
+    try {
+        const bodyData = Object.assign({}, payload, { token: token });
+        const res = await fetch(SCRIPT_URL, {
+            method: 'POST',
+            body: JSON.stringify(bodyData)
+        });
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        return await res.json();
+    } catch (e) {
+        console.error('Annapurna Admin Write Error:', e);
+        return { status: 'error', message: e.message || 'Connection failed' };
+    }
 }
 
+// --- Check Password & Log In ---
 async function checkPassword() {
-    const entered     = document.getElementById('password-input').value;
-    const enteredHash = await sha256(entered);
-    if (enteredHash === getPasswordHash()) {
-        sessionStorage.setItem('annapurna_admin_logged_in', 'true');
+    const entered = (document.getElementById('password-input').value || '').trim();
+    const errorEl = document.getElementById('login-error');
+    errorEl.style.display = 'none';
+
+    if (!entered) {
+        errorEl.textContent = '⚠️ Please enter the admin password.';
+        errorEl.style.display = 'block';
+        return;
+    }
+
+    const loginBtn = document.querySelector('.login-btn');
+    if (loginBtn) { loginBtn.textContent = 'Verifying…'; loginBtn.disabled = true; }
+
+    const res = await sheetWrite({ action: 'authCheck', token: entered });
+
+    if (loginBtn) { loginBtn.textContent = 'Login'; loginBtn.disabled = false; }
+
+    if (res.status === 'ok') {
+        sessionStorage.setItem('annapurna_admin_token', entered);
         document.getElementById('login-screen').style.display = 'none';
         document.getElementById('admin-panel').style.display  = 'block';
         initAdminPanel();
     } else {
-        document.getElementById('login-error').style.display = 'block';
+        errorEl.textContent = '❌ ' + (res.message || 'Incorrect password.');
+        errorEl.style.display = 'block';
     }
 }
 
-document.addEventListener('DOMContentLoaded', function () {
-    if (sessionStorage.getItem('annapurna_admin_logged_in') === 'true') {
+// --- Auto-check Session on Page Load ---
+document.addEventListener('DOMContentLoaded', async function () {
+    const token = getAdminToken();
+    if (token) {
         document.getElementById('login-screen').style.display = 'none';
         document.getElementById('admin-panel').style.display  = 'block';
         initAdminPanel();
     }
     const pw = document.getElementById('password-input');
-    if (pw) pw.addEventListener('keypress', function (e) { if (e.key === 'Enter') checkPassword(); });
+    if (pw) {
+        pw.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') checkPassword();
+        });
+    }
 });
 
 function logout() {
-    sessionStorage.removeItem('annapurna_admin_logged_in');
-    document.getElementById('password-input').value     = '';
+    sessionStorage.removeItem('annapurna_admin_token');
+    document.getElementById('password-input').value       = '';
     document.getElementById('admin-panel').style.display  = 'none';
     document.getElementById('login-screen').style.display = 'flex';
 }
@@ -63,14 +104,15 @@ function togglePw(inputId, btn) {
     btn.title     = hide ? 'Hide password' : 'Show password';
 }
 
+// --- Change Password from Dashboard ---
 async function changePassword() {
-    const current   = document.getElementById('cp-current').value;
-    const newPw     = document.getElementById('cp-new').value;
-    const confirmPw = document.getElementById('cp-confirm').value;
+    const current   = document.getElementById('cp-current').value.trim();
+    const newPw     = document.getElementById('cp-new').value.trim();
+    const confirmPw = document.getElementById('cp-confirm').value.trim();
     const msgEl     = document.getElementById('cp-message');
 
-    if (await sha256(current) !== getPasswordHash()) {
-        return showCpMsg(msgEl, '❌ Current password is incorrect.', 'error');
+    if (current !== getAdminToken()) {
+        return showCpMsg(msgEl, '❌ Current password does not match active session.', 'error');
     }
     if (newPw.length < 6) {
         return showCpMsg(msgEl, '⚠️ New password must be at least 6 characters.', 'warn');
@@ -79,10 +121,23 @@ async function changePassword() {
         return showCpMsg(msgEl, '⚠️ Passwords do not match.', 'warn');
     }
 
-    localStorage.setItem(PASSWORD_STORAGE, await sha256(newPw));
-    ['cp-current','cp-new','cp-confirm'].forEach(id => { document.getElementById(id).value = ''; });
-    showCpMsg(msgEl, '✅ Password changed successfully!', 'ok');
-    setTimeout(() => msgEl.style.display = 'none', 5000);
+    msgEl.textContent = '⏳ Updating password on server…';
+    msgEl.style.display = 'block';
+
+    const res = await sheetWrite({
+        action: 'changePassword',
+        token: current,
+        newPassword: newPw
+    });
+
+    if (res.status === 'ok') {
+        sessionStorage.setItem('annapurna_admin_token', newPw);
+        ['cp-current','cp-new','cp-confirm'].forEach(id => { document.getElementById(id).value = ''; });
+        showCpMsg(msgEl, '✅ Password updated successfully!', 'ok');
+        setTimeout(() => { msgEl.style.display = 'none'; }, 5000);
+    } else {
+        showCpMsg(msgEl, '❌ ' + (res.message || 'Failed to update password.'), 'error');
+    }
 }
 
 function showCpMsg(el, text, type) {
@@ -95,11 +150,11 @@ function showCpMsg(el, text, type) {
 }
 
 // =============================================
-// INIT — load everything after login
+// INIT & DATA LOADING
 // =============================================
 
 async function initAdminPanel() {
-    showMessage('⏳ Loading data from Google Sheets…', 'info');
+    showMessage('⏳ Connecting to Google Sheets…', 'info');
     await refreshAllData();
     await loadContactInfo();
 }
@@ -124,12 +179,12 @@ async function refreshAllData() {
         loadCategories();
         clearMessage();
     } catch (e) {
-        showMessage('❌ Could not load data. Check SHEET_ID in sheets.js — ' + e.message, 'error');
+        showMessage('❌ Could not load products. Please check SHEET_ID in sheets.js', 'error');
     }
 }
 
 // =============================================
-// EXCEL UPLOAD  (bulk import)
+// EXCEL / CSV BULK IMPORT
 // =============================================
 
 function handleExcelUpload(event) {
@@ -149,7 +204,6 @@ function handleExcelUpload(event) {
             showMessage('⏳ Importing ' + rows.length + ' products to Google Sheets…', 'info');
 
             const products = rows.map(function (row) {
-                // Preserve any image URLs already in the sheet for matching products
                 const existing = adminProducts.find(function (p) {
                     return p.name.toLowerCase() === (row.Name || '').toLowerCase();
                 });
@@ -172,15 +226,14 @@ function handleExcelUpload(event) {
                 showMessage('❌ Import failed: ' + (result.message || 'Unknown error'), 'error');
             }
         } catch (err) {
-            showMessage('❌ Could not read the file. Make sure it is a valid .xlsx or .csv.', 'error');
-            console.error(err);
+            showMessage('❌ Could not read file. Ensure it is a valid .xlsx or .csv', 'error');
         }
     };
     reader.readAsArrayBuffer(file);
 }
 
 // =============================================
-// EDIT MENU — Add / Update / Delete items
+// ADD / EDIT / DELETE PRODUCTS
 // =============================================
 
 async function addOrUpdateProduct() {
@@ -192,7 +245,7 @@ async function addOrUpdateProduct() {
 
     if (!name) { showMessage('⚠️ Item Name is required.', 'error'); return; }
 
-    showMessage('⏳ Saving…', 'info');
+    showMessage('⏳ Saving item to Google Sheet…', 'info');
 
     var result;
     if (editingProductIdx !== null) {
@@ -205,10 +258,8 @@ async function addOrUpdateProduct() {
             PricePerPc:   pricePerPc,
             PricePerKg:   pricePerKg,
             Description:  description
-            // ImageURL and Featured are NOT sent — Apps Script preserves them from current row
         });
     } else {
-        // Check for duplicate locally (fast, avoids a round-trip)
         if (adminProducts.find(function (p) { return p.name.toLowerCase() === name.toLowerCase(); })) {
             showMessage('⚠️ "' + name + '" already exists in the menu.', 'error');
             return;
@@ -226,11 +277,11 @@ async function addOrUpdateProduct() {
     }
 
     if (result.status === 'ok') {
-        showMessage(editingProductIdx !== null ? '✅ "' + name + '" updated!' : '✅ "' + name + '" added!');
+        showMessage(editingProductIdx !== null ? '✅ "' + name + '" updated!' : '✅ "' + name + '" added to menu!');
         cancelEdit();
         await refreshAllData();
     } else {
-        showMessage('❌ Save failed: ' + (result.message || 'Check SCRIPT_URL in sheets.js'), 'error');
+        showMessage('❌ Save failed: ' + (result.message || 'Authorization failed'), 'error');
     }
 }
 
@@ -271,11 +322,11 @@ async function deleteProduct(idx) {
     if (!p) return;
     if (!confirm('Remove "' + p.name + '" from the menu?')) return;
 
-    showMessage('⏳ Deleting…', 'info');
+    showMessage('⏳ Removing from Google Sheet…', 'info');
     const result = await sheetWrite({ action: 'deleteProduct', Name: p.name });
 
     if (result.status === 'ok') {
-        showMessage('🗑️ "' + p.name + '" removed.');
+        showMessage('🗑️ "' + p.name + '" removed from menu.');
         await refreshAllData();
     } else {
         showMessage('❌ Delete failed: ' + (result.message || ''), 'error');
@@ -283,7 +334,7 @@ async function deleteProduct(idx) {
 }
 
 // =============================================
-// PRODUCT TABLE (Photo & Feature management)
+// PRODUCT TABLE & DRIVE IMAGE UPLOAD
 // =============================================
 
 function loadProductTable() {
@@ -291,7 +342,7 @@ function loadProductTable() {
     tbody.innerHTML = '';
 
     if (adminProducts.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="6" class="empty-row">No products yet. Upload an Excel sheet or add items using the Edit Menu above.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="6" class="empty-row">No products yet. Add items above or import an Excel file.</td></tr>';
         return;
     }
 
@@ -323,7 +374,8 @@ function loadProductTable() {
         tbody.appendChild(tr);
     });
 
-    // Attach events via delegation (safe — no inline dynamic strings in event handlers)
+    tbody.removeEventListener('change', handleTableChange);
+    tbody.removeEventListener('click', handleTableClick);
     tbody.addEventListener('change', handleTableChange);
     tbody.addEventListener('click', handleTableClick);
 }
@@ -347,16 +399,12 @@ function handleTableClick(e) {
     if (!isNaN(idx)) removeImage(idx);
 }
 
-// =============================================
-// MENU LIST (Edit menu section)
-// =============================================
-
 function loadMenuList() {
     const container = document.getElementById('menu-list');
     if (!container) return;
 
     if (adminProducts.length === 0) {
-        container.innerHTML = '<p style="padding:16px;font-style:italic;color:#aaa;">No items yet. Add one using the form above.</p>';
+        container.innerHTML = '<p style="padding:16px;font-style:italic;color:#aaa;">No items yet.</p>';
         return;
     }
 
@@ -379,32 +427,25 @@ function loadMenuList() {
         container.appendChild(row);
     });
 
-    // Event delegation
-    container.addEventListener('click', function (e) {
+    container.onclick = function (e) {
         const btn = e.target.closest('[data-idx]');
         if (!btn) return;
         const idx = parseInt(btn.dataset.idx, 10);
         if (btn.classList.contains('edit-item-btn'))   editProduct(idx);
         if (btn.classList.contains('delete-item-btn')) deleteProduct(idx);
-    });
+    };
 }
-
-// =============================================
-// IMAGE UPLOAD — uploads to Google Drive via Apps Script
-// =============================================
 
 async function handleImageUpload(file, idx) {
     if (!file) return;
     const p = adminProducts[idx];
     if (!p) return;
 
-    showMessage('⏳ Compressing & uploading image to Google Drive…', 'info');
+    showMessage('⏳ Compressing and uploading photo to Google Drive…', 'info');
 
-    // Compress image client-side before upload (target ≤ 600px wide, JPEG 80%)
     const compressed = await compressImage(file);
     const base64     = compressed.split(',')[1];
 
-    // Step 1: upload the file to Drive
     const uploadResult = await sheetWrite({
         action:   'uploadImage',
         base64:   base64,
@@ -417,23 +458,21 @@ async function handleImageUpload(file, idx) {
         return;
     }
 
-    // Step 2: save the Drive URL to the product row in the Sheet
     const updateResult = await sheetWrite({
-        action:    'updateProduct',
+        action:       'updateProduct',
         originalName: p.name,
-        Name:      p.name,
-        ImageURL:  uploadResult.url
+        Name:         p.name,
+        ImageURL:     uploadResult.url
     });
 
     if (updateResult.status === 'ok') {
-        showMessage('✅ Photo uploaded for "' + p.name + '"!');
+        showMessage('✅ Photo uploaded and linked for "' + p.name + '"!');
         await refreshAllData();
     } else {
-        showMessage('⚠️ Photo saved to Drive but sheet update failed.', 'error');
+        showMessage('⚠️ Image uploaded to Drive, but updating sheet failed: ' + updateResult.message, 'error');
     }
 }
 
-/** Compress an image using an offscreen canvas. Returns a JPEG data URL. */
 function compressImage(file) {
     return new Promise(function (resolve) {
         const reader = new FileReader();
@@ -467,20 +506,16 @@ async function removeImage(idx) {
         originalName: p.name,
         Name:         p.name,
         ImageURL:     '',
-        Featured:     'FALSE'    // also un-feature when image is removed
+        Featured:     'FALSE'
     });
 
     if (result.status === 'ok') {
-        showMessage('🗑️ Image removed from "' + p.name + '".');
+        showMessage('🗑️ Photo removed from "' + p.name + '".');
         await refreshAllData();
     } else {
         showMessage('❌ Error removing image: ' + (result.message || ''), 'error');
     }
 }
-
-// =============================================
-// FEATURE TOGGLE
-// =============================================
 
 async function toggleFeature(idx, checkbox) {
     const p = adminProducts[idx];
@@ -490,7 +525,7 @@ async function toggleFeature(idx, checkbox) {
         const count = adminProducts.filter(function (x) { return x.isFeatured; }).length;
         if (count >= 12) {
             checkbox.checked = false;
-            showMessage('⚠️ Maximum 12 featured items allowed on the homepage.', 'error');
+            showMessage('⚠️ Maximum 12 items can be featured on homepage.', 'error');
             return;
         }
     }
@@ -506,29 +541,24 @@ async function toggleFeature(idx, checkbox) {
         p.isFeatured = checkbox.checked;
         showMessage(checkbox.checked ? '⭐ Added to Homepage!' : 'Removed from Homepage.');
     } else {
-        checkbox.checked = !checkbox.checked;  // revert
+        checkbox.checked = !checkbox.checked;
         showMessage('❌ Could not update: ' + (result.message || ''), 'error');
     }
 }
 
 // =============================================
-// CATEGORIES  (derived from Products sheet)
+// CATEGORIES & CONTACT
 // =============================================
 
 function loadCategories() {
     const listEl = document.getElementById('category-list');
     if (listEl) {
         const cats = getUsedCategories();
-        if (cats.length === 0) {
-            listEl.innerHTML = '<p style="color:#aaa;font-style:italic;font-size:0.85rem;">Categories are created automatically when you add products with that category name.</p>';
-        } else {
-            listEl.innerHTML = cats.map(function (c) {
-                return '<div style="background:#fef3c7;border:1px solid #fde68a;color:#92400e;padding:5px 14px;border-radius:20px;font-size:0.8rem;font-weight:bold;">' + esc(c) + '</div>';
-            }).join('');
-        }
+        listEl.innerHTML = cats.map(function (c) {
+            return '<div style="background:#fef3c7;border:1px solid #fde68a;color:#92400e;padding:5px 14px;border-radius:20px;font-size:0.8rem;font-weight:bold;">' + esc(c) + '</div>';
+        }).join('');
     }
 
-    // Also refresh the category dropdown in the add-item form
     const select = document.getElementById('new-category');
     if (select) {
         const defaults = ['Sweets', 'Snack', 'Grocery'];
@@ -558,17 +588,8 @@ function addCategory() {
         select.value = name;
     }
     input.value = '';
-    showMessage('"' + name + '" added to dropdown. Use it when adding a product to save it permanently.');
+    showMessage('"' + name + '" added to category dropdown.');
 }
-
-// deleteCategory is not needed with the Sheets approach; just leave the button wired
-function deleteCategory(name) {
-    showMessage('To delete a category, delete all products in that category from the menu.', 'info');
-}
-
-// =============================================
-// CONTACT INFO
-// =============================================
 
 async function loadContactInfo() {
     try {
@@ -578,52 +599,46 @@ async function loadContactInfo() {
         const blk  = document.getElementById('contact-bulk');
         if (gen) gen.value = get('general_wa');
         if (blk) blk.value = get('bulk_wa');
-    } catch (e) {
-        console.warn('Could not load contact info:', e);
-    }
+    } catch (e) {}
 }
 
 async function saveContactInfo() {
     const general = document.getElementById('contact-general').value.trim();
     const bulk    = document.getElementById('contact-bulk').value.trim();
 
-    showMessage('⏳ Saving contact info…', 'info');
+    showMessage('⏳ Saving WhatsApp numbers to Google Sheets…', 'info');
     const result = await sheetWrite({ action: 'saveConfig', general_wa: general, bulk_wa: bulk });
 
     if (result.status === 'ok') {
         showMessage('📞 Contact info saved successfully!');
     } else {
-        showMessage('❌ Save failed: ' + (result.message || 'Check SCRIPT_URL in sheets.js'), 'error');
+        showMessage('❌ Save failed: ' + (result.message || ''), 'error');
     }
 }
 
-// =============================================
-// CLEAR ALL DATA
-// =============================================
-
 async function clearAllData() {
     if (!confirm('Are you sure? This permanently deletes ALL products from the Google Sheet.')) return;
-    showMessage('⏳ Clearing all data…', 'info');
+    showMessage('⏳ Clearing products…', 'info');
     const result = await sheetWrite({ action: 'clearAll' });
     if (result.status === 'ok') {
         adminProducts = [];
         loadProductTable();
         loadMenuList();
-        showMessage('🗑️ All product data cleared from the sheet.');
+        showMessage('🗑️ All products cleared from the sheet.');
     } else {
         showMessage('❌ Error: ' + (result.message || ''), 'error');
     }
 }
 
 // =============================================
-// STATUS MESSAGE
+// UI HELPERS
 // =============================================
 
 function showMessage(msg, type) {
     const el = document.getElementById('status-message');
     if (!el) return;
-    el.textContent    = msg;
-    el.style.display  = 'block';
+    el.textContent       = msg;
+    el.style.display     = 'block';
     el.style.background  = type === 'error' ? '#fef2f2' : type === 'info' ? '#eff6ff' : '#f0fdf4';
     el.style.color       = type === 'error' ? '#dc2626' : type === 'info' ? '#1d4ed8' : '#16a34a';
     el.style.borderColor = type === 'error' ? '#fecaca' : type === 'info' ? '#bfdbfe' : '#bbf7d0';
@@ -635,11 +650,6 @@ function clearMessage() {
     if (el) el.style.display = 'none';
 }
 
-// =============================================
-// UTILITY
-// =============================================
-
-/** HTML-escape a string for safe insertion into innerHTML. */
 function esc(str) {
     return String(str || '')
         .replace(/&/g, '&amp;')
