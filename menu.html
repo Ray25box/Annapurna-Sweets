@@ -347,13 +347,13 @@
         </div><!-- end .card-inner -->
     </div><!-- end .menu-card -->
 
+<script src="sheets.js"></script>
 <script>
     // =============================================
-    // Menu Page — reads from localStorage
+    // Menu Page — reads from Google Sheets
     // =============================================
-    var STORAGE_KEY = 'annapurna_products';
 
-    var CONFIG = {
+    var CAT_CONFIG = {
         Sweets:  { title: 'SWEETS MENU',  header: '&#127852; Sweets',  col2: 'Price&nbsp;/&nbsp;Pc', col3: 'Price&nbsp;/&nbsp;kg' },
         Snack:   { title: 'SNACKS MENU',  header: '&#127840; Snacks',  col2: 'Price&nbsp;/&nbsp;Pc', col3: 'Price&nbsp;/&nbsp;Plt' },
         Grocery: { title: 'GROCERY MENU', header: '&#128717; Grocery', col2: 'Price&nbsp;/&nbsp;Pc', col3: 'Price&nbsp;/&nbsp;kg' }
@@ -361,27 +361,26 @@
 
     var params = new URLSearchParams(window.location.search);
     var cat = params.get('cat') || 'Sweets';
-    var cfg = CONFIG[cat] || CONFIG['Sweets'];
+    var cfg = CAT_CONFIG[cat] || { title: cat.toUpperCase() + ' MENU', header: cat, col2: 'Price&nbsp;/&nbsp;Pc', col3: 'Price&nbsp;/&nbsp;kg' };
 
-    // Set browser tab title
-    document.title = cfg.title + ' — Annapurna Sweets';
-
-    // Load products from localStorage
-    var allProducts = [];
-    try { allProducts = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); } catch(e) {}
-    var items = allProducts.filter(function(p) { return p.category === cat; });
+    document.title = cfg.title + ' \u2014 Annapurna Sweets';
 
     var contentEl = document.getElementById('menu-content');
+    contentEl.innerHTML = '<div class="empty-state"><div class="e-icon">&#8987;</div><p>Loading menu\u2026</p></div>';
 
-    if (items.length === 0) {
-        contentEl.innerHTML =
-            '<div class="section-header">' + cfg.header + '</div>' +
-            '<div class="empty-state">' +
-                '<div class="e-icon">&#127860;</div>' +
-                '<p>No items have been added yet.<br>Check back soon!</p>' +
-            '</div>';
-    } else {
-        // Column headers row
+    fetchSheet('Products').then(function(allProducts) {
+        var items = allProducts.filter(function(p) { return p.Category === cat; });
+
+        if (items.length === 0) {
+            contentEl.innerHTML =
+                '<div class="section-header">' + cfg.header + '</div>' +
+                '<div class="empty-state">' +
+                    '<div class="e-icon">&#127860;</div>' +
+                    '<p>No items have been added yet.<br>Check back soon!</p>' +
+                '</div>';
+            return;
+        }
+
         var colHeaders =
             '<div class="col-headers">' +
                 '<span class="ch-name"></span>' +
@@ -389,21 +388,20 @@
                 '<span>' + cfg.col3 + '</span>' +
             '</div>';
 
-        // Item rows
         var rows = items.map(function(p, i) {
-            var pc  = p.pricePerPc || p.price || '';
-            var sec = p.pricePerKg || '';
+            var pc  = p.PricePerPc  || '';
+            var sec = p.PricePerKg  || '';
 
             var pcCell  = pc  ? '<span class="row-price">&#8377;&nbsp;' + pc  + '</span>'
                               : '<span class="row-price na">&mdash;&mdash;&mdash;&mdash;</span>';
             var secCell = sec ? '<span class="row-price">&#8377;&nbsp;' + sec + '</span>'
                               : '<span class="row-price na">&mdash;&mdash;&mdash;&mdash;</span>';
 
-            var descHtml = p.description ? '<small>' + p.description + '</small>' : '';
+            var descHtml = p.Description ? '<small>' + p.Description + '</small>' : '';
 
             return '<div class="menu-row">' +
                 '<span class="row-num">' + (i + 1) + '</span>' +
-                '<span class="row-name">' + p.name + descHtml + '</span>' +
+                '<span class="row-name">' + p.Name + descHtml + '</span>' +
                 pcCell +
                 secCell +
             '</div>';
@@ -413,7 +411,7 @@
             '<div class="section-header">' + cfg.header + '</div>' +
             colHeaders +
             '<div class="menu-items">' + rows + '</div>';
-    }
+    });
 </script>
 
 </body>

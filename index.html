@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Annapurna Sweets - Authentic Bengali Sweets</title>
     <link rel="stylesheet" href="style.css">
+    <script src="sheets.js"></script>
 </head>
 <body>
 
@@ -50,13 +51,9 @@
                     </div>
                 </div>
                 <span class="divider">|</span>
-                <a href="#">FESTIVE BOXES</a>
-                <span class="divider">|</span>
                 <a href="gallery.html">GALLERY</a>
                 <span class="divider">|</span>
-                <a href="#">GIFTING</a>
-                <span class="divider">|</span>
-                <a href="#">CONTACT</a>
+                <a href="#order-section">CONTACT</a>
             </div>
         </nav>
 
@@ -86,43 +83,30 @@
             </div>
             
             <script>
-                document.addEventListener('DOMContentLoaded', function() {
+                document.addEventListener('DOMContentLoaded', async function() {
                     const grid = document.getElementById('featured-products-grid');
-                    const productsStr = localStorage.getItem('annapurna_products');
-                    
-                    if (!productsStr) {
-                        grid.innerHTML = '<p style="grid-column: 1 / -1; text-align: center; color: #8b3a1a; padding: 40px; font-style: italic;">No featured items yet. Admin can upload photos in the dashboard to feature products here.</p>';
+                    grid.innerHTML = '<p style="grid-column:1/-1;text-align:center;color:#8b3a1a;padding:40px;">Loading…</p>';
+
+                    const products = await fetchSheet('Products');
+                    const featured = products.filter(function(p) {
+                        return p.ImageURL && isFeatured(p.Featured);
+                    });
+
+                    if (featured.length === 0) {
+                        grid.innerHTML = '<p style="grid-column:1/-1;text-align:center;color:#8b3a1a;padding:40px;font-style:italic;">No featured items yet.</p>';
                         return;
                     }
 
-                    try {
-                        const allProducts = JSON.parse(productsStr);
-                        // Filter for items with images AND marked as featured
-                        const featuredProducts = allProducts.filter(p => p.image && p.isFeatured);
-
-                        if (featuredProducts.length === 0) {
-                            grid.innerHTML = '<p style="grid-column: 1 / -1; text-align: center; color: #8b3a1a; padding: 40px; font-style: italic;">No featured items yet. Admin can upload photos in the dashboard to feature products here.</p>';
-                            return;
-                        }
-
-                        grid.innerHTML = featuredProducts.map((p, index) => {
-                            const desc = p.description || p.category;
-                            return `
-                                <div class="product-card">
-                                    <span class="card-number">${index + 1}</span>
-                                    <div class="product-img">
-                                        <img src="${p.image}" alt="${p.name}">
-                                    </div>
-                                    <h3>${p.name.toUpperCase()}</h3>
-                                    <p>${desc}</p>
-                                    <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
-                                </div>
-                            `;
-                        }).join('');
-
-                    } catch (e) {
-                        grid.innerHTML = '<p>Error loading featured products.</p>';
-                    }
+                    grid.innerHTML = featured.slice(0, 12).map(function(p, i) {
+                        var desc = p.Description || p.Category;
+                        return '<div class="product-card">' +
+                            '<span class="card-number">' + (i + 1) + '</span>' +
+                            '<div class="product-img"><img src="' + driveImg(p.ImageURL) + '" alt="' + p.Name + '"></div>' +
+                            '<h3>' + p.Name.toUpperCase() + '</h3>' +
+                            '<p>' + desc + '</p>' +
+                            '<div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>' +
+                        '</div>';
+                    }).join('');
                 });
             </script>
         </section>
@@ -162,31 +146,27 @@
 
             </div>
             <script>
-                document.addEventListener('DOMContentLoaded', function() {
-                    const infoStr = localStorage.getItem('annapurna_contact_info');
-                    if (infoStr) {
-                        try {
-                            const info = JSON.parse(infoStr);
-                            
-                            const setupBtn = (type, number) => {
-                                const btn = document.getElementById('wa-btn-' + type);
-                                const txt = document.getElementById('wa-txt-' + type);
-                                if (number) {
-                                    txt.innerText = number;
-                                    // Remove spaces for the link
-                                    const cleanNum = number.replace(/\D/g, '');
-                                    btn.href = 'https://wa.me/91' + cleanNum;
-                                } else {
-                                    btn.style.opacity = '0.5';
-                                    btn.style.pointerEvents = 'none';
-                                }
-                            };
-                            
-                            setupBtn('general', info.general);
-                            setupBtn('bulk', info.bulk);
+                document.addEventListener('DOMContentLoaded', async function() {
+                    const config = await fetchSheet('Config');
+                    var get = function(key) {
+                        var row = config.find(function(r) { return r.Key === key; });
+                        return row ? row.Value : '';
+                    };
 
-                        } catch(e) {}
-                    }
+                    var setupBtn = function(type, number) {
+                        var btn = document.getElementById('wa-btn-' + type);
+                        var txt = document.getElementById('wa-txt-' + type);
+                        if (number) {
+                            txt.innerText = number;
+                            btn.href = 'https://wa.me/91' + number.replace(/\D/g, '');
+                        } else {
+                            btn.style.opacity = '0.5';
+                            btn.style.pointerEvents = 'none';
+                        }
+                    };
+
+                    setupBtn('general', get('general_wa'));
+                    setupBtn('bulk', get('bulk_wa'));
                 });
             </script>
         </section>
