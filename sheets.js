@@ -54,17 +54,30 @@ async function fetchSheet(sheetName) {
 }
 
 // =============================================
-// Direct Image URL Converter
+// Direct Image URL Converter (Modern Google CDN)
 // =============================================
 function driveImg(url) {
     if (!url) return '';
     url = url.trim();
-    if (url.includes('drive.google.com/uc')) {
-        return url.includes('export=') ? url : url + '&export=view';
+    // Extract file ID from any Google Drive sharing or direct link
+    var m = url.match(/\/d\/([a-zA-Z0-9_-]+)/) || 
+            url.match(/[?&]id=([a-zA-Z0-9_-]+)/) ||
+            url.match(/googleusercontent\.com\/d\/([a-zA-Z0-9_-]+)/);
+    if (m) {
+        // Modern Google UserContent CDN (avoids deprecated /uc blocks)
+        return 'https://lh3.googleusercontent.com/d/' + m[1];
     }
-    var m = url.match(/\/d\/([a-zA-Z0-9_-]+)/) || url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
-    if (m) return 'https://drive.google.com/uc?export=view&id=' + m[1];
     return url;
+}
+
+// Fallback to Google Drive high-resolution thumbnail if CDN is delayed
+function driveImgFallback(img) {
+    if (img.dataset.hasFallback) return;
+    img.dataset.hasFallback = 'true';
+    var m = img.src.match(/\/d\/([a-zA-Z0-9_-]+)/) || img.src.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+    if (m) {
+        img.src = 'https://drive.google.com/thumbnail?id=' + m[1] + '&sz=w1000';
+    }
 }
 
 // =============================================

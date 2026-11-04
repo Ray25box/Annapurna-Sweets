@@ -101,7 +101,7 @@
                         var desc = p.Description || p.Category;
                         return '<div class="product-card">' +
                             '<span class="card-number">' + (i + 1) + '</span>' +
-                            '<div class="product-img"><img src="' + driveImg(p.ImageURL) + '" alt="' + p.Name + '"></div>' +
+                            '<div class="product-img"><img src="' + driveImg(p.ImageURL) + '" alt="' + p.Name + '" onerror="driveImgFallback(this)"></div>' +
                             '<h3>' + p.Name.toUpperCase() + '</h3>' +
                             '<p>' + desc + '</p>' +
                             '<div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>' +

@@ -100,7 +100,7 @@
                         items.forEach(function(p) {
                             var desc = p.Description || p.Category;
                             html += '<div class="product-card">' +
-                                '<div class="product-img"><img src="' + driveImg(p.ImageURL) + '" alt="' + p.Name + '"></div>' +
+                                '<div class="product-img"><img src="' + driveImg(p.ImageURL) + '" alt="' + p.Name + '" onerror="driveImgFallback(this)"></div>' +
                                 '<h3>' + p.Name.toUpperCase() + '</h3>' +
                                 '<p>' + desc + '</p>' +
                             '</div>';

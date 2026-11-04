@@ -4,7 +4,7 @@
 // =============================================
 
 // 🔧 The Google Apps Script Web App URL for executing admin write operations:
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx8PBszOt1QbBG-nvPQLNHlA3VEQc3GM0L4DhEuhXLKUKIKTw3mGyPDqaWFAV24HCTsaA/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzZOluq1i7ydGCH6lYm8rZdetYzOdQaTt-Uu9JT-6Aj7vP0Kw2T-k6fcjb1ByXsPoKJEg/exec';
 
 var adminProducts     = [];
 var editingProductIdx = null;
@@ -252,29 +252,76 @@ function handleExcelUpload(event) {
 // ADD / EDIT / DELETE PRODUCTS
 // =============================================
 
+function previewNewPhoto(input) {
+    const preview = document.getElementById('new-photo-preview');
+    if (!preview) return;
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            preview.src = e.target.result;
+            preview.style.display = 'block';
+        };
+        reader.readAsDataURL(input.files[0]);
+    } else {
+        preview.style.display = 'none';
+        preview.src = '';
+    }
+}
+
 async function addOrUpdateProduct() {
     const name        = document.getElementById('new-name').value.trim();
     const category    = document.getElementById('new-category').value;
     const pricePerPc  = document.getElementById('new-price-pc').value.trim();
     const pricePerKg  = document.getElementById('new-price-kg').value.trim();
     const description = document.getElementById('new-description').value.trim();
+    const photoInput  = document.getElementById('new-photo');
+    const isFeatured  = document.getElementById('new-featured') ? document.getElementById('new-featured').checked : false;
 
     if (!name) { showMessage('⚠️ Item Name is required.', 'error'); return; }
+
+    let uploadedImageUrl = '';
+
+    // If an image is selected from the device, upload it automatically to Google Drive
+    if (photoInput && photoInput.files && photoInput.files[0]) {
+        showMessage('⏳ Compressing & uploading photo to Google Drive…', 'info');
+        try {
+            const compressed = await compressImage(photoInput.files[0]);
+            const base64     = compressed.split(',')[1];
+            const uploadResult = await sheetWrite({
+                action:   'uploadImage',
+                base64:   base64,
+                mimeType: 'image/jpeg',
+                filename: (name.replace(/[^a-z0-9]/gi, '_') || 'product') + '.jpg'
+            });
+            if (uploadResult.status === 'ok') {
+                uploadedImageUrl = uploadResult.url;
+            } else {
+                showMessage('⚠️ Photo upload to Drive failed: ' + (uploadResult.message || 'error') + '. Saving item without photo.', 'error');
+            }
+        } catch (err) {
+            console.error('Photo upload error:', err);
+        }
+    }
 
     showMessage('⏳ Saving item to Google Sheet…', 'info');
 
     var result;
     if (editingProductIdx !== null) {
         const p = adminProducts[editingProductIdx];
-        result = await sheetWrite({
+        const updatePayload = {
             action:       'updateProduct',
             originalName: p.name,
             Name:         name,
             Category:     category,
             PricePerPc:   pricePerPc,
             PricePerKg:   pricePerKg,
-            Description:  description
-        });
+            Description:  description,
+            Featured:     isFeatured ? 'TRUE' : 'FALSE'
+        };
+        if (uploadedImageUrl) {
+            updatePayload.ImageURL = uploadedImageUrl;
+        }
+        result = await sheetWrite(updatePayload);
     } else {
         if (adminProducts.find(function (p) { return p.name.toLowerCase() === name.toLowerCase(); })) {
             showMessage('⚠️ "' + name + '" already exists in the menu.', 'error');
@@ -287,13 +334,13 @@ async function addOrUpdateProduct() {
             PricePerPc:  pricePerPc,
             PricePerKg:  pricePerKg,
             Description: description,
-            ImageURL:    '',
-            Featured:    'FALSE'
+            ImageURL:    uploadedImageUrl,
+            Featured:    isFeatured ? 'TRUE' : 'FALSE'
         });
     }
 
     if (result.status === 'ok') {
-        showMessage(editingProductIdx !== null ? '✅ "' + name + '" updated!' : '✅ "' + name + '" added to menu!');
+        showMessage(editingProductIdx !== null ? '✅ "' + name + '" updated!' : '✅ "' + name + '" added with photo!');
         cancelEdit();
         await refreshAllData();
     } else {
@@ -312,6 +359,21 @@ function editProduct(idx) {
     document.getElementById('new-price-kg').value    = p.pricePerKg;
     document.getElementById('new-description').value = p.description;
 
+    if (document.getElementById('new-featured')) {
+        document.getElementById('new-featured').checked = !!p.isFeatured;
+    }
+
+    const preview = document.getElementById('new-photo-preview');
+    if (preview) {
+        if (p.image) {
+            preview.src = p.image;
+            preview.style.display = 'block';
+        } else {
+            preview.style.display = 'none';
+            preview.src = '';
+        }
+    }
+
     const submitBtn = document.getElementById('submit-btn');
     submitBtn.innerHTML        = '&#10004; Update Item';
     submitBtn.style.background = '#16a34a';
@@ -326,6 +388,18 @@ function cancelEdit() {
     ['new-name','new-price-pc','new-price-kg','new-description'].forEach(function (id) {
         document.getElementById(id).value = '';
     });
+    if (document.getElementById('new-photo')) {
+        document.getElementById('new-photo').value = '';
+    }
+    const preview = document.getElementById('new-photo-preview');
+    if (preview) {
+        preview.style.display = 'none';
+        preview.src = '';
+    }
+    if (document.getElementById('new-featured')) {
+        document.getElementById('new-featured').checked = false;
+    }
+
     const submitBtn = document.getElementById('submit-btn');
     submitBtn.innerHTML        = '&#43; Add Item to Menu';
     submitBtn.style.background = '';
@@ -366,7 +440,7 @@ function loadProductTable() {
         const tr = document.createElement('tr');
 
         const photoCell = p.image
-            ? '<img src="' + p.image + '" style="width:52px;height:52px;object-fit:cover;border-radius:8px;border:1px solid #ddd;" onerror="this.style.display=\'none\'">'
+            ? '<img src="' + p.image + '" style="width:52px;height:52px;object-fit:cover;border-radius:8px;border:1px solid #ddd;" onerror="driveImgFallback(this)">'
             : '<span style="color:#bbb;font-size:0.78rem;font-style:italic;">No image</span>';
 
         const removeBtn = p.image
